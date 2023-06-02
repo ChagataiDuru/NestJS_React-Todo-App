@@ -1,0 +1,3 @@
+### List all users
+
+GET http://localhost3000:/users
