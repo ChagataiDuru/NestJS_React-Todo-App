@@ -12,18 +12,20 @@ const scrypt = promisify(_scrypt);
 export class AuthService {
     constructor(private userService: UserService) {}
 
-    async signUp(email: string, pass: string) {
-        const user = await this.userService.findOneByEmail(email);
+    async signUp(userDto: CreateUserDto) {
+        const user = await this.userService.findOneByEmail(userDto.email);
         if(user){
-            throw new BadRequestException('User already exists');
+            throw new BadRequestException('User with this email already exists');
         }
         const salt = randomBytes(8).toString('hex');
-        const hash = (await scrypt(pass, salt, 32)) as Buffer;
+        const hash = (await scrypt(userDto.password, salt, 32)) as Buffer;
         const result = salt + '.' + hash.toString('hex');
 
-        const userDto = plainToClass(CreateUserDto, {email, password: result});
+        const userDtoInstance = plainToClass(CreateUserDto, {userDto, password: result});
 
-        const newUser = await this.userService.create(userDto);
+        console.log('User to dto instance:', userDtoInstance);
+
+        const newUser = await this.userService.create(userDtoInstance);
         return newUser;
     }
     

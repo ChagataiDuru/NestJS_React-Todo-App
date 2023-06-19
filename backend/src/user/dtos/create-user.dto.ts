@@ -8,7 +8,7 @@ export class CreateUserDto {
   @IsEmail()
   email: string
 
-  @IsEmail()
+  @IsString()
   bio: string
 
   @IsString()

@@ -11,9 +11,15 @@ import { UserPayload } from './user.payload';
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<User>) {}
     
-      async create(body: CreateUserDto): Promise<UserPayload> {
-          const createdUser = new this.userModel(body)
+      async create(body: any): Promise<User> {
+          console.log('The User will saved from request:', body);
+          const dto = body.userDto;
+          console.log('DTO', dto);
+          dto.password = body.password;
+          const createdUser = new this.userModel(dto)
+          console.log('User to be created to save:', createdUser);
           try {
+            console.log('Saving user...');
             const user = await createdUser.save()
             console.log('User saved:', user);
             return user;
@@ -51,7 +57,7 @@ export class UserService {
           return this.userModel.findOne({email: email}).exec();
         }
       
-      async findOneById(id: string): Promise<User> {
+      async findOneById(id: number): Promise<User> {
           return this.userModel.findOne({id: id}).exec();
-        }
+      }
 }
