@@ -9,11 +9,11 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({})
   );
-  app.enableCors({ origin: '*' })
+  app.enableCors({ origin: '*' }) // enable cors for all origins
   app.useGlobalPipes(new ValidationPipe({}))
   app.enableVersioning({ type: VersioningType.URI })
-  app.use(helmet())
-  app.use(compression())
+  app.use(helmet()) // for security
+  app.use(compression()) // for performance
   await app.listen(3000);
 }
 bootstrap();

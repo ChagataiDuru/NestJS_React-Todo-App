@@ -1,10 +1,20 @@
-import { IsEmail, IsString, IsNotEmpty } from 'class-validator';
+import { OmitType } from '@nestjs/swagger'
+import { IsEmail, IsString } from 'class-validator'
 
 export class CreateUserDto {
-    @IsEmail()
-    email: string;
+  @IsString()
+  fullName: string
 
-    @IsString()
-    @IsNotEmpty()
-    password: string;
+  @IsEmail()
+  email: string
+
+  @IsEmail()
+  bio: string
+
+  @IsString()
+  password: string
 }
+
+export class UpdateUserInput extends OmitType(CreateUserDto, [
+  'password'
+] as const) {}

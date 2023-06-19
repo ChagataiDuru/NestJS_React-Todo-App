@@ -10,10 +10,10 @@ const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
-    constructor(private usersService: UserService) {}
+    constructor(private userService: UserService) {}
 
     async signUp(email: string, pass: string) {
-        const user = await this.usersService.findOneByEmail(email);
+        const user = await this.userService.findOneByEmail(email);
         if(user){
             throw new BadRequestException('User already exists');
         }
@@ -23,12 +23,12 @@ export class AuthService {
 
         const userDto = plainToClass(CreateUserDto, {email, password: result});
 
-        const newUser = await this.usersService.create(userDto);
+        const newUser = await this.userService.create(userDto);
         return newUser;
     }
     
     async signin(email: string, password: string) {
-        const user = await this.usersService.findOneByEmail(email);
+        const user = await this.userService.findOneByEmail(email);
         if (!user) {
           throw new NotFoundException('user not found');
         }

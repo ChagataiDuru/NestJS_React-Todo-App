@@ -12,7 +12,7 @@ import { User } from './user.schema';
 
 @Controller('auth')
 @Serialize(UserDto)
-export class UsersController {
+export class UserController {
     constructor(
         private usersService: UserService,
         private authService: AuthService
