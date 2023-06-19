@@ -16,7 +16,6 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({})
   );
-  //app.useGlobalInterceptors(new TimeoutInterceptor());
   app.enableCors({ origin: '*' }) // enable cors for all origins
   app.useGlobalPipes(new ValidationPipe({}))
   app.enableVersioning({ type: VersioningType.URI })

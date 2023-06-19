@@ -1,11 +1,13 @@
 import { Module,MiddlewareConsumer } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { ThrottlerModule } from '@nestjs/throttler'
-import { MongooseModule,getConnectionToken } from '@nestjs/mongoose'
+import { MongooseModule } from '@nestjs/mongoose'
 
 import { AppService } from './app.service'
 import { AppController } from './app.controller'
 import { UserModule } from './user/user.module'
+import { APP_INTERCEPTOR } from '@nestjs/core'
+import { TimeoutInterceptor } from './interceptors/timeout.interceptor'
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -19,7 +21,13 @@ const cookieSession = require('cookie-session');
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TimeoutInterceptor
+    }
+  ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

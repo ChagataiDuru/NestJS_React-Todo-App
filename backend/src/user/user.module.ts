@@ -9,6 +9,7 @@ import mongoose from 'mongoose';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
 import { User, UserSchema } from './user.schema';
+import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
 
 @Module({
     imports: [
@@ -27,6 +28,6 @@ import { User, UserSchema } from './user.schema';
           ])
     ],
     controllers: [UserController],
-    providers: [UserService, AuthService],
+    providers: [UserService, AuthService,CurrentUserMiddleware],
 })
 export class UserModule {}
