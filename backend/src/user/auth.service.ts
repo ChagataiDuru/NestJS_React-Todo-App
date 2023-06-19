@@ -4,13 +4,13 @@ import { promisify } from "util";
 import { plainToClass } from 'class-transformer';
 import { CreateUserDto } from "./dtos/create-user.dto";
 
-import { UsersService } from "../users/users.service";
+import { UserService } from "./user.service";
 
 const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
-    constructor(private usersService: UsersService) {}
+    constructor(private usersService: UserService) {}
 
     async signUp(email: string, pass: string) {
         const user = await this.usersService.findOneByEmail(email);
