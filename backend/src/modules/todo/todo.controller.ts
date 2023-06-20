@@ -1,9 +1,11 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
+import { AuthGuard } from 'src/guards/auth.guard';
 import { TodoService } from './todo.service';
 import { ToDo } from './todo.schema';
-import { AuthGuard } from 'src/guards/auth.guard';
+import { CreateTodoDto } from './dtos/create-todo.dto';
+import { UpdateTodoDto } from './dtos/update-todo.dto';
 
 @Controller('todos')
 export class TodoController {
@@ -11,10 +13,9 @@ export class TodoController {
 
     @Post()
     @UseGuards(AuthGuard)
-    @ApiOkResponse({ type: ToDo, description: 'Successfully created todo' })
+    @ApiOkResponse({ type: CreateTodoDto, description: 'Successfully created todo' })
     @ApiBadRequestResponse({ description: 'Bad request' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-    
     async create(@Body() todo: ToDo): Promise<ToDo> {
         return this.todoService.create(todo);
     }
@@ -27,19 +28,25 @@ export class TodoController {
 
     @Get(':id')
     @UseGuards(AuthGuard)
-    async findOneById(@Param('id') id: string): Promise<ToDo> {
-        return this.todoService.findOneById(id);
+    async findOneById(@Param('id') todoId: string): Promise<ToDo> {
+        return this.todoService.findOneById(todoId);
     }
 
     @Put(':id')
     @UseGuards(AuthGuard)
-    async update(@Param('id') id: string, @Body() todo: ToDo): Promise<ToDo> {
-        return this.todoService.update(id, todo);
+    @ApiOkResponse({ type: UpdateTodoDto, description: 'Successfully updated todo' })
+    @ApiBadRequestResponse({ description: 'Bad request' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    async update(@Param('id') todoId: string, @Body() todo: ToDo): Promise<ToDo> {
+        return this.todoService.update(todoId, todo);
     }
 
     @Delete(':id')
     @UseGuards(AuthGuard)
-    async delete(@Param('id') id: string): Promise<void> {
-        return this.todoService.delete(id);
+    @ApiOkResponse({ description: 'Successfully deleted todo' })
+    @ApiBadRequestResponse({ description: 'Bad request' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    async delete(@Param('id') todoId: string): Promise<void> {
+        return this.todoService.delete(todoId);
     }
 }

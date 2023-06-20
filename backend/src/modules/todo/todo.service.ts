@@ -5,7 +5,7 @@ import { ToDo } from './todo.schema';
 
 @Injectable()
 export class TodoService {
-  constructor(@InjectModel('Todo') private readonly todoModel: Model<ToDo>) {}
+  constructor(@InjectModel(ToDo.name) private readonly todoModel: Model<ToDo>) {}
 
   async findAll(): Promise<ToDo[]> {
     return this.todoModel.find().exec();

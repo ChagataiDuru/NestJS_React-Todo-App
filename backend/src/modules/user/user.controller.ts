@@ -1,5 +1,5 @@
-import { Controller, Body, Post, Get, NotFoundException, UseInterceptors, Param, UseGuards, Session} from '@nestjs/common';
-import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Body, Post, Get, NotFoundException, Param, UseGuards, Session} from '@nestjs/common';
+import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, } from '@nestjs/swagger';
 
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { CreateUserDto } from './dtos/create-user.dto';

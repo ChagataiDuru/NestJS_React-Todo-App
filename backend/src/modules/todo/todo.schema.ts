@@ -16,9 +16,6 @@ export class ToDo {
     
     @Prop()
     completed: boolean
-
-    @Prop()
-    createdAt: Date
 }
 
 export const ToDoSchema = SchemaFactory.createForClass(ToDo)
