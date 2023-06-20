@@ -44,13 +44,13 @@ export class UserService {
       }
     
       async updateUser(id: string, body: UpdateUserInput): Promise<UserPayload> {
-        await this.userModel.updateOne({ _id: id }, body)
+        await this.userModel.updateOne({ userId: id }, body)
         const updatedUser = this.userModel.findById(id)
         return updatedUser
       }
     
       async deleteUser(id: string): Promise<void> {
-        await this.userModel.deleteOne({ _id: id })
+        await this.userModel.deleteOne({ userId: id })
       }
 
       async findOneByEmail(email: string): Promise<User> {
@@ -58,6 +58,6 @@ export class UserService {
         }
       
       async findOneById(id: number): Promise<User> {
-          return this.userModel.findOne({id: id}).exec();
+          return this.userModel.findOne({userId: id}).exec();
       }
 }
