@@ -1,4 +1,5 @@
 import { Controller, Body, Post, Get, NotFoundException, UseInterceptors, Param, UseGuards, Session} from '@nestjs/common';
+import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -25,10 +26,13 @@ export class UserController {
     }
 
     @Post('/signup')
+    @ApiOkResponse({ type: CreateUserDto, description: 'Successfully created user' })
+    @ApiBadRequestResponse({ description: 'User with that email already exists.' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
     async createUser(@Body() body: CreateUserDto, @Session() session: any) {
       try {
         const user = await this.authService.signUp(body);
-        console.log('User:', user);
+        console.log('Signed Up User:', user);
         session.userId = user.userId;
         return user;
       } catch (error) {
@@ -38,9 +42,11 @@ export class UserController {
     }
   
     @Post('/signin')
+    @ApiOkResponse({ type: LoginUserDto, description: 'Successfully logged in' })
+    @ApiBadRequestResponse({ description: 'Bad credentials' })
     async signin(@Body() body: LoginUserDto, @Session() session: any) {
       const user = await this.authService.signin(body.email, body.password);
-      console.log('User:', user);
+      console.log('The User Logged In:', user);
       session.userId = user.userId;
       console.log('Session:', session);
       return user;

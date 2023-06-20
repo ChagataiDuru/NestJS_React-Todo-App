@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { ModelDefinition, MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { AutoIncrementID, AutoIncrementIDOptions } from '@typegoose/auto-increment'
@@ -28,6 +28,10 @@ import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
           ])
     ],
     controllers: [UserController],
-    providers: [UserService, AuthService,CurrentUserMiddleware],
+    providers: [UserService, AuthService],
 })
-export class UserModule {}
+export class UserModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(CurrentUserMiddleware).forRoutes('*');
+    }
+}
