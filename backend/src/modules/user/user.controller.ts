@@ -8,7 +8,7 @@ import { UserDto } from './dtos/user.dto';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { AuthGuard } from '../guards/auth.guard';
+import { AuthGuard } from '../../guards/auth.guard';
 import { User } from './user.schema';
 
 @Controller('auth')

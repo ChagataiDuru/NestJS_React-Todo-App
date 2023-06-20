@@ -1,14 +1,17 @@
 import { Module,MiddlewareConsumer } from '@nestjs/common'
+import { APP_INTERCEPTOR } from '@nestjs/core'
 import { ConfigModule } from '@nestjs/config'
 import { ThrottlerModule } from '@nestjs/throttler'
 import { MongooseModule } from '@nestjs/mongoose'
 
 import { AppService } from './app.service'
 import { AppController } from './app.controller'
-import { UserModule } from './user/user.module'
-import { APP_INTERCEPTOR } from '@nestjs/core'
+
 import { TimeoutInterceptor } from './interceptors/timeout.interceptor'
-import { TodoModule } from './todo/todo.module';
+
+import { TodoModule } from './modules/todo/todo.module';
+import { UserModule } from './modules/user/user.module'
+
 const cookieSession = require('cookie-session');
 
 @Module({
