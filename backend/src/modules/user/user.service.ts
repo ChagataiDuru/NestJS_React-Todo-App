@@ -2,7 +2,7 @@ import { Model } from 'mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { User } from './user.schema';
+import { User, UserDocument } from './user.schema';
 import { CreateUserDto,UpdateUserInput } from './dtos/create-user.dto';
 import { UserPayload } from './user.payload';
 
@@ -57,7 +57,7 @@ export class UserService {
           return this.userModel.findOne({email: email}).exec();
         }
       
-      async findOneById(id: number): Promise<User> {
+      async findOneById(id: number): Promise<UserDocument> {
           return this.userModel.findOne({userId: id}).exec();
       }
 }

@@ -7,7 +7,7 @@ export class UpdateTodoDto {
   @ApiProperty()
   title: string
 
-  @IsEmail()
+  @IsString()
   @IsOptional()
   @ApiProperty()
   description: string

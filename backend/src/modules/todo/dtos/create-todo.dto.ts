@@ -1,16 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEmail, IsString } from 'class-validator'
+import { IsString } from 'class-validator'
+import { Types } from 'mongoose'
 
 export class CreateTodoDto {
   @IsString()
   @ApiProperty()
   title: string
 
-  @IsEmail()
+  @IsString()
   @ApiProperty()
   description: string
 
   @IsString()
   @ApiProperty()
   completed: boolean
+
+  @ApiProperty()
+  owner: Types.ObjectId
 }

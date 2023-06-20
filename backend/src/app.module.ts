@@ -28,10 +28,10 @@ const cookieSession = require('cookie-session');
   controllers: [AppController],
   providers: [
     AppService,
-    {
+/*     {
       provide: APP_INTERCEPTOR,
       useClass: TimeoutInterceptor
-    }
+    } */
   ],
 })
 export class AppModule {

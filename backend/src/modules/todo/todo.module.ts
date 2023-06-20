@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import { TodoService } from './todo.service';
 import { TodoController } from './todo.controller';
 import { ToDo, ToDoSchema } from './todo.schema';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { ToDo, ToDoSchema } from './todo.schema';
             return schema
           }
         }
-      ])
+      ]),
+      UserModule,
 ],
   providers: [TodoService],
   controllers: [TodoController]

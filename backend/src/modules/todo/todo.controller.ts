@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Session } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -9,18 +9,18 @@ import { UpdateTodoDto } from './dtos/update-todo.dto';
 
 @Controller('todos')
 export class TodoController {
-  constructor(private readonly todoService: TodoService) {}
+    constructor(private readonly todoService: TodoService) {}
 
-    @Post()
+    @Post('/create')
     @UseGuards(AuthGuard)
     @ApiOkResponse({ type: CreateTodoDto, description: 'Successfully created todo' })
     @ApiBadRequestResponse({ description: 'Bad request' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-    async create(@Body() todo: CreateTodoDto) {
-        return this.todoService.create(todo);
+    async create(@Body() todo: CreateTodoDto, @Session() session: any) {
+        return this.todoService.create(todo, session.userId);
     }
 
-    @Get()
+    @Get('/all')
     @UseGuards(AuthGuard)
     async findAll() {
 

@@ -25,6 +25,7 @@ import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
           ])
     ],
     controllers: [UserController],
+    exports: [UserService],
     providers: [UserService, AuthService],
 })
 export class UserModule {
