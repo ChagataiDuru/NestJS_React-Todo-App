@@ -58,6 +58,7 @@ export class UserController {
     }
 
     @Get('/users')
+    @UseGuards(AuthGuard)
     async getAllUsers() {
         const user = this.usersService.findAll();
         if (!user) {
@@ -67,6 +68,7 @@ export class UserController {
     }
 
     @Get('/user:id')
+    @UseGuards(AuthGuard)
     async getUser(@Param('id') id: string) {
         const nmbrId = Number(id);
         const user = await this.usersService.findOneById(nmbrId);

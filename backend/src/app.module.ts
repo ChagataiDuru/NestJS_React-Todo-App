@@ -8,6 +8,7 @@ import { AppController } from './app.controller'
 import { UserModule } from './user/user.module'
 import { APP_INTERCEPTOR } from '@nestjs/core'
 import { TimeoutInterceptor } from './interceptors/timeout.interceptor'
+import { TodoModule } from './todo/todo.module';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -19,6 +20,7 @@ const cookieSession = require('cookie-session');
         dbName: process.env.DATABASE_NAME,
       }),
     UserModule,
+    TodoModule,
   ],
   controllers: [AppController],
   providers: [

@@ -16,10 +16,7 @@ export class CurrentUserMiddleware implements NestMiddleware {
   constructor(private usersService: UserService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
-    console.log('Request session:', req.session);
-    console.log('Request session user id:', req.session.userId);
     const userId = req.session.userId || {};
-    console.log('User Id from current user middleware:', userId);
     if (typeof userId === 'number') {
       const user = await this.usersService.findOneById(userId);
       console.log('User from current user middleware:', user);

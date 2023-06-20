@@ -2,7 +2,6 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { ModelDefinition, MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { AutoIncrementID, AutoIncrementIDOptions } from '@typegoose/auto-increment'
-import AutoIncrementFactory from 'mongoose-sequence'
 import mongoose from 'mongoose';
 
 
@@ -19,8 +18,6 @@ import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
               inject: [getConnectionToken()],
               useFactory: (connection: mongoose.Connection): ModelDefinition['schema'] => {
                 const schema = UserSchema
-                // const plugin = AutoIncrementFactory(connection)
-                // schema.plugin(plugin, { inc_field: 'id', id: 'user_id'})
                 schema.plugin(AutoIncrementID, { field: 'userId' } as AutoIncrementIDOptions)
                 return schema
               }
