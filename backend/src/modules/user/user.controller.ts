@@ -60,7 +60,7 @@ export class UserController {
     @Get('/users')
     @UseGuards(AuthGuard)
     async getAllUsers() {
-        const user = this.usersService.findAll();
+        const user = await this.usersService.findAll();
         if (!user) {
             return new NotFoundException('No users found');
         }

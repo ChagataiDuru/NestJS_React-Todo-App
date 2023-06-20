@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument } from 'mongoose'
+import { HydratedDocument, Document, Types, Schema as MongooseSchema } from 'mongoose'
 
 export type ToDoDocument = HydratedDocument<ToDo>
 
 @Schema({ collection: 'todos', timestamps: true })
-export class ToDo {
+export class ToDo extends Document {
     @Prop()
     todoId: number
     
@@ -16,6 +16,10 @@ export class ToDo {
     
     @Prop()
     completed: boolean
+
+    @Prop({type: MongooseSchema.Types.ObjectId , ref: 'User'})
+    owner: Types.ObjectId
+
 }
 
 export const ToDoSchema = SchemaFactory.createForClass(ToDo)
