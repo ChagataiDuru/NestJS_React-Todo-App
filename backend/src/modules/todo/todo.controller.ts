@@ -21,11 +21,11 @@ export class TodoController {
     @ApiBadRequestResponse({ description: 'Bad request' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error' })
     async create(@Body() todo: CreateTodoDto, @Session() session: any) {
-        return this.todoService.create(todo, session.user);
+        return this.todoService.create(todo, session.userId);
     }
 
     @Get('/all')
-    @UseGuards(AdminGuard)
+    //@UseGuards(AdminGuard)
     async findAll() {
         return this.todoService.findAll();
     }

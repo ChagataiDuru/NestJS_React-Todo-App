@@ -1,5 +1,4 @@
-import React, { useState, useReducer } from 'react';
-import ReactDOM from 'react-dom';
+import { useReducer } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import './newTodoForm.css';
 
