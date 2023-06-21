@@ -17,12 +17,15 @@ export class CurrentUserMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const userId = req.session.userId || {};
+
     if (typeof userId === 'number') {
-      const user = await this.usersService.findOneById(userId);
-      console.log('User from current user middleware:', user);
-      req.currentUser = user;
-    }else{
-      req.currentUser = null;
+        const user = await this.usersService.findOneById(userId).then((user) => {
+        console.log('User from current user middleware:', user);
+        req.currentUser = user;
+      }).catch((error) => {
+        req.currentUser = null;
+        console.error('Error getting user from current user middleware:', error)
+        });
     }
 
     next();
