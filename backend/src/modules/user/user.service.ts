@@ -1,5 +1,6 @@
-import { Model } from 'mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { User, UserDocument } from './user.schema';
@@ -9,13 +10,19 @@ import { UserPayload } from './user.payload';
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+    constructor(
+    @InjectModel(User.name) 
+    private userModel: Model<User>,
+    
+    private eventEmitter: EventEmitter2
+    ) {}
     
       async create(body: any): Promise<User> {
           console.log('The User will saved from request:', body);
           const dto = body.userDto;
           console.log('DTO', dto);
           dto.password = body.password;
+          dto.isAdmin = false;
           const createdUser = new this.userModel(dto)
           console.log('User to be created to save:', createdUser);
           try {
@@ -49,15 +56,22 @@ export class UserService {
         return updatedUser
       }
     
-      async deleteUser(id: string): Promise<void> {
+      async deleteUser(id: number): Promise<void> {
+        console.log('Deleting user...');
+        const user = await this.userModel.findOne({ userId: id }).exec()
+        this.eventEmitter.emit('user.deleted', user._id)
         await this.userModel.deleteOne({ userId: id })
       }
 
-      async findOneByEmail(email: string): Promise<User> {
+      async findOneByEmail(email: string): Promise<UserPayload> {
           return this.userModel.findOne({email: email}).exec();
         }
       
-      async findOneById(id: number): Promise<UserDocument> {
-          return this.userModel.findOne({userId: id}).exec();
+      async findOneById(id: number): Promise<UserDocument> {//Değişcek
+          const user = await this.userModel.findOne({userId: id}).exec();
+          if (!user) {
+            throw new NotFoundException(`User with id:${id} not found `)
+          }
+          return user;
       }
 }

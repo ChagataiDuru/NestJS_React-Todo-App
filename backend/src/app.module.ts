@@ -3,6 +3,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core'
 import { ConfigModule } from '@nestjs/config'
 import { ThrottlerModule } from '@nestjs/throttler'
 import { MongooseModule } from '@nestjs/mongoose'
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { AppService } from './app.service'
 import { AppController } from './app.controller'
@@ -17,6 +18,7 @@ const cookieSession = require('cookie-session');
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    EventEmitterModule.forRoot(),
     ThrottlerModule.forRoot({ limit: 10, ttl: 60 }),
     MongooseModule.forRoot(process.env.DATABASE_URI, 
       {

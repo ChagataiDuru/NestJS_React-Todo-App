@@ -6,7 +6,7 @@ export class AdminGuard implements CanActivate {
     if (!request.currentUser) {
       return false;
     }
-
+    //  user instanceından check edilip admin olup olmadığına bakılacak
     return request.currentUser.admin;
   }
 }

@@ -7,6 +7,7 @@ import { CreateTodoDto } from './dtos/create-todo.dto';
 import { TodoPayload } from './todo.payload';
 import { UserDocument } from '../user/user.schema';
 import { UserService } from '../user/user.service';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class TodoService {
@@ -47,5 +48,11 @@ export class TodoService {
 
   async delete(id: string): Promise<void> {
     await this.todoModel.findByIdAndDelete(id).exec();
+  }
+
+  @OnEvent('user.deleted', { async: true })
+  async handleUserDeletedEvent(id: number): Promise<void> {
+    console.log(`I am ToDo Service and User with id:${id} deleted`);
+    await this.todoModel.deleteMany({ owner: id }).exec();
   }
 }

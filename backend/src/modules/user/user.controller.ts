@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Get, NotFoundException, Param, UseGuards, Session} from '@nestjs/common';
+import { Controller, Body, Post, Get, NotFoundException, Param, UseGuards, Session, Delete} from '@nestjs/common';
 import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, } from '@nestjs/swagger';
 
 import { Serialize } from 'src/interceptors/serialize.interceptor';
@@ -70,14 +70,16 @@ export class UserController {
     @Get('/user:id')
     @UseGuards(AuthGuard)
     async getUser(@Param('id') id: string) {
-        const nmbrId = Number(id);
-        const user = await this.usersService.findOneById(nmbrId);
-        if (!user) {
-            return new NotFoundException('User not found');
+        return await this.usersService.findOneById(Number(id));
+    }
+
+    @Delete('/user:id')
+    @UseGuards(AuthGuard)
+    async deleteUser(@Param('id') id: string) {
+        const user = await this.usersService.findOneById(Number(id));
+        if (user) {
+          return await this.usersService.deleteUser(Number(id));
         }
-        console.log('User:', user);
-        console.log("AAA");
-        return user;
     }
 
 }
