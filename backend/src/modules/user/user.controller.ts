@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { AuthGuard } from '../../guards/auth.guard';
 import { User } from './user.schema';
+import { AdminGuard } from 'src/guards/admin.guard';
 
 @Controller('auth')
 @Serialize(UserDto)
@@ -48,7 +49,8 @@ export class UserController {
       const user = await this.authService.signin(body.email, body.password);
       console.log('The User Logged In:', user);
       session.userId = user.userId;
-      console.log('Session:', session);
+      session.isAdmin = user.isAdmin;
+      console.log('Is Admin:', session.isAdmin);
       return user;
     }
 
@@ -74,7 +76,7 @@ export class UserController {
     }
 
     @Delete('/user:id')
-    @UseGuards(AuthGuard)
+    @UseGuards(AdminGuard)
     async deleteUser(@Param('id') id: string) {
         const user = await this.usersService.findOneById(Number(id));
         if (user) {
