@@ -8,6 +8,7 @@ import { TodoPayload } from './todo.payload';
 import { UserDocument } from '../user/user.schema';
 import { UserService } from '../user/user.service';
 import { OnEvent } from '@nestjs/event-emitter';
+import { UpdateTodoDto } from './dtos/update-todo.dto';
 
 @Injectable()
 export class TodoService {
@@ -24,14 +25,25 @@ export class TodoService {
     return this.todoModel.findById(id).exec();
   }
 
+  async findTodosById(userId: number): Promise<TodoPayload[]> {
+    const user = await this.userService.findOneById(userId);
+    const todos = await this.todoModel.find({ owner: user._id }).populate('owner').exec();
+    return todos;
+  }
+
+  async findApprovedTodos(): Promise<TodoPayload[]> {
+    return this.todoModel.find({ approved: true }).exec();
+  }
+
   async create(body: CreateTodoDto, reqUser: number): Promise<ToDo> {
-    console.log('Request UserId:', reqUser);
     const user = await this.userService.findOneById(reqUser); 
     console.log('The User will saved for ToDo:', user);
+
     body.owner = user._id;
-    console.log('The Owner of ToDo:', body.owner);
+    body.approved = false;
+    console.log('ToDo to be created to save:', body);
     const createdTodo = new this.todoModel(body);
-    console.log('Todo to be created to save:', createdTodo);
+
     try {
       const todo = await createdTodo.save();
       console.log('Todo saved:', todo);
@@ -42,7 +54,7 @@ export class TodoService {
     }
   }
 
-  async update(id: string, todo: ToDo): Promise<TodoPayload> {
+  async update(id: string, todo: UpdateTodoDto): Promise<TodoPayload> {
     return this.todoModel.findByIdAndUpdate(id, todo, { new: true }).exec();
   }
 

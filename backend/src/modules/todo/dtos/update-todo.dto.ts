@@ -13,6 +13,7 @@ export class UpdateTodoDto {
   description: string
 
   @IsString()
+  @IsOptional()
   @ApiProperty()
   completed: boolean
 }

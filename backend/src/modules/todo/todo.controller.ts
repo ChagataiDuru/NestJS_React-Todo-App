@@ -6,8 +6,12 @@ import { TodoService } from './todo.service';
 import { ToDo } from './todo.schema';
 import { CreateTodoDto } from './dtos/create-todo.dto';
 import { UpdateTodoDto } from './dtos/update-todo.dto';
+import { TodoDto } from './dtos/todo.dto';
+import { AdminGuard } from 'src/guards/admin.guard';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
 
 @Controller('todos')
+@Serialize(TodoDto)
 export class TodoController {
     constructor(private readonly todoService: TodoService) {}
 
@@ -17,14 +21,19 @@ export class TodoController {
     @ApiBadRequestResponse({ description: 'Bad request' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error' })
     async create(@Body() todo: CreateTodoDto, @Session() session: any) {
-        return this.todoService.create(todo, session.userId);
+        return this.todoService.create(todo, session.user);
     }
 
     @Get('/all')
-    @UseGuards(AuthGuard)
+    @UseGuards(AdminGuard)
     async findAll() {
-
         return this.todoService.findAll();
+    }
+
+    @Get('/my')
+    @UseGuards(AuthGuard)
+    async findMyTodos(@Session() session: any) {
+        return this.todoService.findTodosById(session.userId);
     }
 
     @Get(':id')
@@ -50,4 +59,11 @@ export class TodoController {
     async delete(@Param('id') todoId: string): Promise<void> {
         return this.todoService.delete(todoId);
     }
+
+    @Get('/main')
+    @UseGuards(AuthGuard)
+    async search(@Session() session: any) {
+        return this.todoService.findApprovedTodos();
+    }
+
 }
