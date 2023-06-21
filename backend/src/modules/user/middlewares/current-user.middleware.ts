@@ -20,7 +20,11 @@ export class CurrentUserMiddleware implements NestMiddleware {
 
     if (typeof userId === 'number') {
         const user = await this.usersService.findOneById(userId).then((user) => {
-        console.log('User from current user middleware:', user);
+        console.log('User from current user middleware:', {
+          name: user.fullName,
+          email: user.email,
+          isAdmin: user.isAdmin,
+        });
         req.currentUser = user;
       }).catch((error) => {
         req.currentUser = null;
