@@ -3,13 +3,6 @@ import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../user.service';
 import { User } from '../user.schema';
 
-declare global {
-  namespace Express {
-    interface Request {
-      currentUser?: User;
-    }
-  }
-}
 
 @Injectable()
 export class CurrentUserMiddleware implements NestMiddleware {

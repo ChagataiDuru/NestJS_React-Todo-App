@@ -7,7 +7,7 @@ import { ApiProperty } from '@nestjs/swagger'
 
 export type ToDoDocument = HydratedDocument<ToDo>
 
-@Schema({ collection: 'todos', timestamps: true })
+@Schema({ collection: 'newtodos', timestamps: true })
 export class ToDo extends Document {
     @Prop()
     todoId: number

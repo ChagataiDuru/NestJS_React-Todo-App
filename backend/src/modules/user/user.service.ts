@@ -40,7 +40,7 @@ export class UserService {
         const user = await this.userModel.findOne({ _id: id }).exec()
     
         if (!user) {
-          throw new NotFoundException(`User with email id:${id} not found `)
+          throw new NotFoundException(`User with user id:${id} not found `)
         }
         return user
       }
@@ -67,10 +67,10 @@ export class UserService {
           return this.userModel.findOne({email: email}).exec();
         }
       
-      async findOneById(id: number): Promise<UserDocument> {//Değişcek
+      async findOneById(id: number): Promise<UserDocument> {
           const user = await this.userModel.findOne({userId: id}).exec();
           if (!user) {
-            throw new NotFoundException(`User with id:${id} not found `)
+            throw new NotFoundException(`User with id: ${id} not found `)
           }
           return user;
       }

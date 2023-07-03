@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { IsBoolean, IsString } from 'class-validator'
 import { Types } from 'mongoose'
 
@@ -11,14 +11,14 @@ export class CreateTodoDto {
   @ApiProperty()
   description: string
 
-  @IsBoolean()
-  @ApiProperty()
+  @ApiPropertyOptional()
   completed: boolean
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   owner: Types.ObjectId
 
-  @IsBoolean()
-  @ApiProperty()
+  @ApiPropertyOptional()
   approved: boolean
+
+  body: import("mongoose").Schema.Types.ObjectId
 }

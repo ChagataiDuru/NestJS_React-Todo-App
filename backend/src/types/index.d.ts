@@ -6,3 +6,11 @@ declare module 'express-session' {
         isAdmin: boolean;
     }
 }
+
+declare global {
+    namespace Express {
+      export interface Request {
+        currentUser?: User;
+      }
+    }
+}
