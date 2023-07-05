@@ -12,6 +12,8 @@ import { TimeoutInterceptor } from './interceptors/timeout.interceptor'
 
 import { TodoModule } from './modules/todo/todo.module';
 import { UserModule } from './modules/user/user.module'
+import { MailModule } from './modules/mail/mail.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 const cookieSession = require('cookie-session');
 
@@ -26,14 +28,17 @@ const cookieSession = require('cookie-session');
       }),
     UserModule,
     TodoModule,
+    MailModule,
+    NotificationModule,
+  
   ],
   controllers: [AppController],
   providers: [
     AppService,
-/*     {
+    {
       provide: APP_INTERCEPTOR,
       useClass: TimeoutInterceptor
-    } */
+    }
   ],
 })
 export class AppModule {

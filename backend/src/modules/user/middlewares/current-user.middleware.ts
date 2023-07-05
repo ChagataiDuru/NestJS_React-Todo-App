@@ -16,7 +16,7 @@ export class CurrentUserMiddleware implements NestMiddleware {
         console.log('User from current user middleware:', {
           name: user.fullName,
           email: user.email,
-          isAdmin: user.isAdmin,
+          isAdmin: user.isAdmin || false
         });
         req.currentUser = user;
       }).catch((error) => {

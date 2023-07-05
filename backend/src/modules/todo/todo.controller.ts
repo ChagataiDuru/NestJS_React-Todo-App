@@ -36,6 +36,19 @@ export class TodoController {
         return this.todoService.findTodosById(session.userId);
     }
 
+    @Get('/main')
+    @UseGuards(AuthGuard)
+    listApprovedTodos() {
+        return this.todoService.listApproveTodos(true);
+    }
+
+    @Get('/list/?')
+    @UseGuards(AdminGuard)
+    findUnApprovedTodos(@Query('approved',ParseBoolPipe) isApproved: boolean) {
+        console.log(isApproved)
+        return this.todoService.listApproveTodos(isApproved);
+    }
+
     @Put('/:id/?')
     @UseGuards(AuthGuard)
     updateDoneTodo(
@@ -70,19 +83,4 @@ export class TodoController {
     delete(@Param('id') todoId: string): Promise<void> {
         return this.todoService.delete(todoId);
     }
-
-    @Get('/main')
-    @UseGuards(AuthGuard)
-    listApprovedTodos() {
-        return this.todoService.listApproveTodos(true);
-    }
-
-    @Get('list/?')
-    @UseGuards(AdminGuard)
-    findUnApprovedTodos(@Query('approved',ParseBoolPipe) isApproved: boolean) {
-        console.log(isApproved)
-        return this.todoService.listApproveTodos(isApproved);
-    }
-
-
 }

@@ -20,5 +20,4 @@ export class CreateTodoDto {
   @ApiPropertyOptional()
   approved: boolean
 
-  body: import("mongoose").Schema.Types.ObjectId
 }

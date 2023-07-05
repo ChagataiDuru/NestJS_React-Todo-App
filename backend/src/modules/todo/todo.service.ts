@@ -27,20 +27,21 @@ export class TodoService {
   }
 
   async findTodosById(Id: number): Promise<TodoPayload[]> {
-    return await this.todoModel.find({ todoId: Id }).populate('owner').exec();;
+    return await this.todoModel.find({ todoId: Id }).exec();;
   }
 
   async listApproveTodos(bool: boolean): Promise<ToDo[]> {
-    return await this.todoModel.find({ approved: bool }).populate('owner').exec();
+    return await this.todoModel.find({ approved: bool }).exec();
   }
 
   async updateField(req: any, Id: number,isCompleted: boolean,isApproved: boolean): Promise<TodoPayload> {
     const todo = await this.todoModel.findOne({todoId : Id}).exec().catch((error) =>
       {
+        console.log(error)
         throw new HttpException('ToDo not found',HttpStatus.NOT_FOUND);
       });
+
     const user = await this.userService.findUser(String(todo.owner));
-    
     if (user.fullName === req.currentUser.fullName) {
       if (user.isAdmin) {
         todo.completed = isCompleted || false
