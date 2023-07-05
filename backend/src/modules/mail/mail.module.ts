@@ -1,9 +1,23 @@
 import { Module } from '@nestjs/common';
-import { MailService } from './mail.service';
-import { MailController } from './mail.controller';
+import { MailerModule,MailerOptions } from '@nestjs-modules/mailer';
 
 @Module({
-  providers: [MailService],
-  controllers: [MailController]
+  imports: [
+    MailerModule.forRootAsync({
+      useFactory: () => ({
+        transport: {
+          host: 'smtp.domain.com',
+          auth: {
+            user: 'user@domain.com',
+            pass: 'password',
+          },
+        },
+        defaults: {
+          from: '"Your Name" <you@domain.com>',
+        },
+      }),
+    }),
+  ],
+  exports: [MailerModule]
 })
 export class MailModule {}

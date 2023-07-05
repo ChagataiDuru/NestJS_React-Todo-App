@@ -8,14 +8,15 @@ import { CreateTodoDto } from './dtos/create-todo.dto';
 import { TodoPayload } from './todo.payload';
 import { UserService } from '../user/user.service';
 import { UpdateTodoDto } from './dtos/update-todo.dto';
-import { plainToInstance } from 'class-transformer';
-import { error } from 'console';
+import { NotificationService } from '../notification/notification.service';
+
 
 @Injectable()
 export class TodoService {
   constructor(
     @InjectModel(ToDo.name) private readonly todoModel: Model<ToDo>,
     private userService: UserService,
+    //private notificationService: NotificationService, 
   ) {}
 
   async findAll(): Promise<TodoPayload[]> {

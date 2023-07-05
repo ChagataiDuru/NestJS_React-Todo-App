@@ -13,7 +13,9 @@ import { Serialize } from 'src/interceptors/serialize.interceptor';
 @Controller('todos')
 @Serialize(TodoDto)
 export class TodoController {
-    constructor(private readonly todoService: TodoService) {}
+    constructor(
+        private readonly todoService: TodoService,
+    ) {}
 
     @Post('/create')
     @UseGuards(AuthGuard)
@@ -32,7 +34,7 @@ export class TodoController {
 
     @Get('/')
     @UseGuards(AuthGuard)
-    findMyTodos(@Session() session: any) {
+    async findMyTodos(@Session() session: any) {
         return this.todoService.findTodosById(session.userId);
     }
 
