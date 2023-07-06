@@ -2,11 +2,12 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../user.service';
 import { User } from '../user.schema';
+import { NotificationService } from 'src/modules/notification/notification.service';
 
 
 @Injectable()
 export class CurrentUserMiddleware implements NestMiddleware {
-  constructor(private usersService: UserService) {}
+  constructor(private usersService: UserService, private notificationServer: NotificationService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
     const userId = req.session.userId || {};

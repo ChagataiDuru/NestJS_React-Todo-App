@@ -11,14 +11,18 @@ import { UpdateTodoDto } from './dtos/update-todo.dto';
 import { NotificationService } from '../notification/notification.service';
 import { UpdateBoolTodoDto } from './dtos/update-bool.dto';
 import { UserDocument } from '../user/user.schema';
+import { Server } from 'socket.io';
 
 
 @Injectable()
 export class TodoService {
+  private messages: string[] = [];
+
   constructor(
     @InjectModel(ToDo.name) private readonly todoModel: Model<ToDo>,
     private userService: UserService,
     private notificationService: NotificationService, 
+    private server: Server,
   ) {}
 
   async findAll(): Promise<ToDoDocument[]> {
@@ -102,5 +106,14 @@ export class TodoService {
   async handleUserDeletedEvent(id: number): Promise<void> {
     console.log(`I am ToDo Service and User with id:${id} deleted`);
     await this.todoModel.deleteMany({ owner: id }).exec();
+  }
+
+  sendMessage(message: string) {
+    this.messages.push(message);
+    this.server.emit('message', message);
+  }
+
+  getMessages(): string[] {
+    return this.messages;
   }
 }
