@@ -4,6 +4,7 @@ import { ValidationPipe,VersioningType  } from '@nestjs/common';
 import helmet from 'helmet';
 import * as compression from 'compression';
 import { setupSwagger } from './utils/setup-swager.util';
+import { RedisIoAdapter } from './RedisIoAdapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,6 +23,9 @@ async function bootstrap() {
   app.enableVersioning({ type: VersioningType.URI })
   app.use(helmet()) // for security
   app.use(compression()) // for performance
-  await app.listen(3000);
+  const redisIoAdapter = new RedisIoAdapter(app);
+  await redisIoAdapter.connectToRedis();
+  app.useWebSocketAdapter(redisIoAdapter);
+  app.listen(3000);
 }
 bootstrap();

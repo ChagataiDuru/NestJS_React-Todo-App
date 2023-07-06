@@ -15,6 +15,7 @@ import { TodoModule } from './modules/todo/todo.module';
 import { UserModule } from './modules/user/user.module';
 import { MailModule } from './modules/mail/mail.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { CheckUserNotificationsMiddleware } from './modules/user/middlewares/check-notifications.middleware';
 
 const cookieSession = require('cookie-session');
 
@@ -60,6 +61,8 @@ export class AppModule {
         }),
       )
       .forRoutes('*');
+      consumer.apply(CheckUserNotificationsMiddleware).forRoutes('/signin');
+    
   }
 }
 

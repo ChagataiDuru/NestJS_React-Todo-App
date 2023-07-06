@@ -3,13 +3,14 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { ToDo } from './todo.schema';
+import { ToDo, ToDoDocument } from './todo.schema';
 import { CreateTodoDto } from './dtos/create-todo.dto';
 import { TodoPayload } from './todo.payload';
 import { UserService } from '../user/user.service';
 import { UpdateTodoDto } from './dtos/update-todo.dto';
 import { NotificationService } from '../notification/notification.service';
 import { UpdateBoolTodoDto } from './dtos/update-bool.dto';
+import { UserDocument } from '../user/user.schema';
 
 
 @Injectable()
@@ -20,11 +21,15 @@ export class TodoService {
     private notificationService: NotificationService, 
   ) {}
 
-  async findAll(): Promise<TodoPayload[]> {
+  async findAll(): Promise<ToDoDocument[]> {
     return this.todoModel.find().populate("owner").exec();
   }
 
-  async findOneById(id: string): Promise<TodoPayload> {
+  async findOneByOwner(owner: UserDocument): Promise<ToDoDocument[]> {
+    return this.todoModel.find({ owner: owner }).exec();
+  }
+
+  async findOneById(id: string): Promise<ToDoDocument> {
     return this.todoModel.findById(id).exec();
   }
 

@@ -34,6 +34,5 @@ import { CheckUserNotificationsMiddleware } from './middlewares/check-notificati
 export class UserModule {
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(CurrentUserMiddleware).forRoutes('*');
-        consumer.apply(CheckUserNotificationsMiddleware).forRoutes('*');
     }
 }

@@ -23,6 +23,7 @@ export class CurrentUserMiddleware implements NestMiddleware {
         req.currentUser = null;
         console.error('Error getting user from current user middleware:', error)
         });
+        console.log('User notification: ', req.currentUser?.notifications || []);
     }
 
     next();
