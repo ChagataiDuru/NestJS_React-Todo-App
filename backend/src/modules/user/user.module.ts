@@ -7,8 +7,10 @@ import mongoose from 'mongoose';
 
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
+import { NotificationModule } from '../notification/notification.module';
 import { User, UserSchema } from './user.schema';
 import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
+import { CheckUserNotificationsMiddleware } from './middlewares/check-notifications.middleware';
 
 @Module({
     imports: [
@@ -22,7 +24,8 @@ import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
                 return schema
               }
             }
-          ])
+          ]),
+          NotificationModule,
     ],
     controllers: [UserController],
     exports: [UserService],
@@ -31,5 +34,6 @@ import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
 export class UserModule {
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(CurrentUserMiddleware).forRoutes('*');
+        consumer.apply(CheckUserNotificationsMiddleware).forRoutes('*');
     }
 }

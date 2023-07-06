@@ -9,6 +9,7 @@ import { TodoPayload } from './todo.payload';
 import { UserService } from '../user/user.service';
 import { UpdateTodoDto } from './dtos/update-todo.dto';
 import { NotificationService } from '../notification/notification.service';
+import { UpdateBoolTodoDto } from './dtos/update-bool.dto';
 
 
 @Injectable()
@@ -16,7 +17,7 @@ export class TodoService {
   constructor(
     @InjectModel(ToDo.name) private readonly todoModel: Model<ToDo>,
     private userService: UserService,
-    //private notificationService: NotificationService, 
+    private notificationService: NotificationService, 
   ) {}
 
   async findAll(): Promise<TodoPayload[]> {
@@ -28,14 +29,19 @@ export class TodoService {
   }
 
   async findTodosById(Id: number): Promise<TodoPayload[]> {
-    return await this.todoModel.find({ todoId: Id }).exec();;
+    const user = await this.userService.findOneById(Id);
+    const todos = await this.todoModel.find({ owner: user }).exec();
+    const dueTodos = todos.filter((todo) => todo.due < new Date());
+    console.log(dueTodos);
+    this.notificationService.createNotificationsForDueTodos(dueTodos,user);
+    return todos
   }
 
   async listApproveTodos(bool: boolean): Promise<ToDo[]> {
     return await this.todoModel.find({ approved: bool }).exec();
   }
 
-  async updateField(req: any, Id: number,isCompleted: boolean,isApproved: boolean): Promise<TodoPayload> {
+  async updateField(req: any, Id: number,dto: UpdateBoolTodoDto): Promise<TodoPayload> {
     const todo = await this.todoModel.findOne({todoId : Id}).exec().catch((error) =>
       {
         console.log(error)
@@ -45,10 +51,10 @@ export class TodoService {
     const user = await this.userService.findUser(String(todo.owner));
     if (user.fullName === req.currentUser.fullName) {
       if (user.isAdmin) {
-        todo.completed = isCompleted || false
-        todo.approved  = isApproved  || false
+        todo.completed = dto.completed || false
+        todo.approved  = dto.approved  || false
       }else{
-        todo.completed = isCompleted || false
+        todo.completed = dto.completed || false
       }
       return todo;
     }else{

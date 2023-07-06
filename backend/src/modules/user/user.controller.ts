@@ -69,13 +69,13 @@ export class UserController {
         return user;
     }
 
-    @Get('/user:id')
-    @UseGuards(AuthGuard)
+    @Get('/users/:id')
+    @UseGuards(AdminGuard)
     async getUser(@Param('id') id: string) {
         return await this.usersService.findOneById(Number(id));
     }
 
-    @Delete('/user:id')
+    @Delete('/users/:id')
     @UseGuards(AdminGuard)
     async deleteUser(@Param('id') id: string) {
         const user = await this.usersService.findOneById(Number(id));

@@ -4,7 +4,7 @@ import { User, UserDocument } from '../user/user.schema'
 
 export type ToDoDocument = HydratedDocument<ToDo>
 
-@Schema({ collection: 'newtodos', timestamps: true })
+@Schema({ collection: 'todos', timestamps: true })
 export class ToDo extends Document {
     @Prop()
     todoId: number
@@ -15,6 +15,9 @@ export class ToDo extends Document {
     @Prop()
     description: string
     
+    @Prop()
+    due: Date
+
     @Prop()
     completed: boolean
 

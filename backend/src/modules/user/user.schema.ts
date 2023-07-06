@@ -22,6 +22,10 @@ export class User {
 
   @Prop()
   isAdmin: boolean
+
+  @Prop()
+  notifications: number[]
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

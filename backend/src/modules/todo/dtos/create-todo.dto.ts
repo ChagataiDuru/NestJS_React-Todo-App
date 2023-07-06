@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsBoolean, IsString } from 'class-validator'
+import { IsDate, IsString } from 'class-validator'
 import { Types } from 'mongoose'
 
 export class CreateTodoDto {
@@ -10,6 +10,9 @@ export class CreateTodoDto {
   @IsString()
   @ApiProperty()
   description: string
+
+  @ApiProperty()
+  due: Date
 
   @ApiPropertyOptional()
   completed: boolean

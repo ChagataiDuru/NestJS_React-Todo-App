@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/swagger'
-import { Notification } from './notification.schema'
+import { NotificationModel } from './notification.schema'
 
-export class NotificationPayload extends PartialType(Notification) {
+export class NotificationPayload extends PartialType(NotificationModel) {
   createdA?: string
   updateAt?: string
 }

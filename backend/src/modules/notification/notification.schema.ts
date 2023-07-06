@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument, Document, Types, Schema as MongooseSchema } from 'mongoose'
 
-export type NotificationDocument = HydratedDocument<Notification>
+export type NotificationDocument = HydratedDocument<NotificationModel>
 
 @Schema({ collection: 'notifications', timestamps: true })
-export class Notification extends Document {
+export class NotificationModel extends Document {
     @Prop()
     notificationId: number
     
@@ -16,11 +16,11 @@ export class Notification extends Document {
     
     @Prop({
         type: String,
-        enum : ['minor','medium','major','critical'],
+        enum: ['minor','medium','major','critical'],
         default: 'minor'
     })
     notificationType: string
 
 }
 
-export const NotificationSchema = SchemaFactory.createForClass(Notification)
+export const NotificationSchema = SchemaFactory.createForClass(NotificationModel)

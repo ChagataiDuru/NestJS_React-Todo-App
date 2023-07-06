@@ -4,13 +4,13 @@ import { AutoIncrementID, AutoIncrementIDOptions } from '@typegoose/auto-increme
 import mongoose from 'mongoose';
 
 import { NotificationService } from './notification.service';
-import { Notification, NotificationSchema } from './notification.schema';
+import { NotificationModel, NotificationSchema } from './notification.schema';
 
 @Module({
   imports: [    
     MongooseModule.forFeatureAsync([
     {
-      name: Notification.name,
+      name: NotificationModel.name,
       inject: [getConnectionToken()],
       useFactory: (connection: mongoose.Connection): ModelDefinition['schema'] => {
         const schema = NotificationSchema

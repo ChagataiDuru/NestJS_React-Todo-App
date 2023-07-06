@@ -6,6 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
 import { CreateUserDto,UpdateUserInput } from './dtos/create-user.dto';
 import { UserPayload } from './user.payload';
+import { NotificationService } from '../notification/notification.service';
 
 
 @Injectable()
@@ -13,8 +14,8 @@ export class UserService {
     constructor(
     @InjectModel(User.name) 
     private userModel: Model<User>,
-    
-    private eventEmitter: EventEmitter2
+    private eventEmitter: EventEmitter2,
+    private notificationService: NotificationService,
     ) {}
     
       async create(body: any): Promise<User> {
