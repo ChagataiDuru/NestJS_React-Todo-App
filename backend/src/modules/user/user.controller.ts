@@ -11,18 +11,25 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { AuthGuard } from '../../guards/auth.guard';
 import { User } from './user.schema';
 import { AdminGuard } from 'src/guards/admin.guard';
+import { NotificationService } from '../notification/notification.service';
 
 @Controller('auth')
 @Serialize(UserDto)
 export class UserController {
     constructor(
         private usersService: UserService,
+        private notificationService: NotificationService,
         private authService: AuthService
     ) {}
     
     @Get('/whoami')
     @UseGuards(AuthGuard)
-    whoAmI(@CurrentUser() user: User) {
+    async whoAmI(@CurrentUser() user: User) {
+      for (const notificationId of user.notifications) {
+        const notification = await this.notificationService.findUserNotification(notificationId);
+        if (notification)
+          console.log('You Have some notifications:', notification);
+      }
       return user;
     }
 

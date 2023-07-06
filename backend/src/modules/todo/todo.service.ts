@@ -32,8 +32,10 @@ export class TodoService {
     const user = await this.userService.findOneById(Id);
     const todos = await this.todoModel.find({ owner: user }).exec();
     const dueTodos = todos.filter((todo) => todo.due < new Date());
-    console.log(dueTodos);
+    const approvedTodos = todos.filter((todo) => todo.approved);
+    console.log(approvedTodos);
     this.notificationService.createNotificationsForDueTodos(dueTodos,user);
+    this.notificationService.createNotificationsForApprovedTodos(approvedTodos,user);
     return todos
   }
 
@@ -56,6 +58,7 @@ export class TodoService {
       }else{
         todo.completed = dto.completed || false
       }
+      todo.save();
       return todo;
     }else{
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
