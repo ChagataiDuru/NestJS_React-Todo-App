@@ -16,6 +16,8 @@ import { UserModule } from './modules/user/user.module';
 import { MailModule } from './modules/mail/mail.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { CheckUserNotificationsMiddleware } from './modules/user/middlewares/check-notifications.middleware';
+import { AppGateway } from './app.gateway';
+import { AppSocketService } from './app.socket.service';
 
 const cookieSession = require('cookie-session');
 
@@ -46,6 +48,8 @@ const cookieSession = require('cookie-session');
   controllers: [AppController],
   providers: [
     AppService,
+    AppGateway,
+    AppSocketService,
 /*     {
       provide: APP_INTERCEPTOR,
       useClass: TimeoutInterceptor

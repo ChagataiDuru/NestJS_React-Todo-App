@@ -47,6 +47,21 @@ export class TodoController {
     return this.todoService.create(todo, session.userId);
   }
 
+  @Get('message')
+  getMessages(): string[] {
+    return this.todoService.getMessages();
+  }
+
+  @Post('message/:message')
+  sendMessage(@Param('message') message: string) {
+    this.todoService.sendMessage(message);
+  }
+
+  @Get('client')
+  listClients(): string[] {
+    return this.todoService.listClients();
+  }
+
   @Get('/all')
   @UseGuards(AdminGuard)
   findAll() {

@@ -8,8 +8,7 @@ import { TodoController } from './todo.controller';
 import { ToDo, ToDoSchema } from './todo.schema';
 import { UserModule } from '../user/user.module';
 import { NotificationModule } from '../notification/notification.module';
-import { Server } from 'socket.io';
-import { TodoGateway } from './todo.gateway';
+
 
 @Module({
   imports: [
@@ -27,7 +26,7 @@ import { TodoGateway } from './todo.gateway';
       UserModule,
       NotificationModule,
 ],
-  providers: [TodoService, TodoGateway],
+  providers: [TodoService],
   exports: [TodoService],
   controllers: [TodoController]
 })
