@@ -5,6 +5,8 @@ import helmet from 'helmet';
 import * as compression from 'compression';
 import { setupSwagger } from './utils/setup-swager.util';
 import { RedisIoAdapter } from './RedisIoAdapter';
+//import { createAdapter } from '@nestjs/platform-socket.io';
+import { Server } from 'socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

@@ -1,7 +1,7 @@
 # Docker Compose Configuration
 # visit https://docs.docker.com/compose/
 
-version: '3.8'
+version: '3.9'
 services:
   # app service for your backend
   app:
@@ -17,15 +17,27 @@ services:
     ports:
       - '4000:4000'
     depends_on:
-      - database
+      - mongodb
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - node-network
 
   # start the mongodb service as container
-  database:
+  mongodb:
     image: mongo:6.0
     container_name: mongodb
     restart: always
     ports:
       - '27017:27017'
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: pass
+    volumes:
+      - ./data:/data/db
+    networks:
+      - node-network
+
+volumes:
+  dbdata6:
+
+networks:
+  node-network:
+    driver: bridge

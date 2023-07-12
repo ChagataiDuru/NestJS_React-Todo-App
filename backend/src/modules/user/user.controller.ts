@@ -54,10 +54,10 @@ export class UserController {
     @ApiBadRequestResponse({ description: 'Bad credentials' })
     async signin(@Body() body: LoginUserDto, @Session() session: any) {
       const user = await this.authService.signin(body.email, body.password);
-      console.log('The User Logged In:', user);
+      
       session.userId = user.userId;
       session.isAdmin = user.isAdmin;
-      console.log('Is Admin:', session.isAdmin);
+
       return user;
     }
 

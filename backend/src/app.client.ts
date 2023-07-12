@@ -1,5 +1,6 @@
 import * as readline from 'readline';
 import { io, Socket } from 'socket.io-client';
+import axios from 'axios';
 
 export class AppClient {
 
@@ -7,9 +8,21 @@ export class AppClient {
   private socket: Socket;
 
   private url = this.args[0] || 'http://localhost:3000';
+  socketOptions: any
 
   connect() {
-    this.socket = io(this.url);
+    this.socketOptions = {
+      withCredentials: true,
+      transportOptions: {
+        polling: {
+          extraHeaders: {
+            userId: 0,
+          }
+        }
+      }
+    };
+
+    this.socket = io(this.url, this.socketOptions);
     this.socket.on('connect', () => {
       console.log(`Connected to WebSocket server: ${this.url}`);
     });
@@ -26,16 +39,22 @@ export class AppClient {
   }
 
   sendMessage(message: string) {
-    this.socket.emit('message',this.socket, message);
+    console.log(`Sending message: ${message}`);
+    this.socket.emit('message', message);
   }
 
-  authenticate(rl: readline.Interface) {
-    rl.question('Enter your email: ', (email: string) => {
-      rl.question('Enter your password: ', (password: string) => {
-        const credentials = { email, password };
-        this.sendMessage(JSON.stringify(credentials));
-      });
-    });
+  async authenticate(rl: readline.Interface) {
+    const email = await this.prompt(rl, 'Enter your email: ');
+    const password = await this.prompt(rl, 'Enter your password: ');
+
+    try {
+      const response = await axios.post(`${this.url}/auth/signin`, { email, password }, { withCredentials: true });
+      this.socketOptions.transportOptions.polling.extraHeaders.userId = response.data.userId;
+      console.log(`Authenticated with Id: ${response.data.userId}`);
+    } catch (error) {
+      console.error(`Authentication failed: ${error.message}`);
+      this.authenticate(rl);
+    }
   }
 
   start() {
@@ -43,6 +62,9 @@ export class AppClient {
       input: process.stdin,
       output: process.stdout,
     });
+    this.authenticate(rl);
+    console.log('Type a message and press enter to send');
+    console.log('Type "exit" to quit');
     rl.on('line', (input: string) => {
       if (input === 'exit') {
         this.disconnect();
@@ -52,7 +74,13 @@ export class AppClient {
     });
   }
 
-
+  private async prompt(rl: readline.Interface, question: string): Promise<string> {
+    return new Promise((resolve) => {
+      rl.question(question, (answer: string) => {
+        resolve(answer);
+      });
+    });
+  }
 }
 
 const client = new AppClient();
