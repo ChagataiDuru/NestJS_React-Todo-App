@@ -1,8 +1,22 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { Logger } from '@nestjs/common';
+import { Transport } from '@nestjs/microservices';
 
+// Create new logger instance
+const logger = new Logger('Main');
+
+// Create micro service options
+const microserviceOptions = {
+  name: 'TODO_SERVICE',
+  transport: Transport.REDIS,
+  options: {
+    url: 'redis://redis:6379',
+  },
+};
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  const app = await NestFactory.createMicroservice(microserviceOptions);
+  app.listen().then(() => {
+    logger.log('Todo microservice is listening ... ');
+  });
 }
 bootstrap();
