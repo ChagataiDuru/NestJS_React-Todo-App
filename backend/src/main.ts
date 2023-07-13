@@ -25,9 +25,9 @@ async function bootstrap() {
   app.enableVersioning({ type: VersioningType.URI })
   app.use(helmet()) // for security
   app.use(compression()) // for performance
-  const redisIoAdapter = new RedisIoAdapter(app);
-  await redisIoAdapter.connectToRedis();
-  app.useWebSocketAdapter(redisIoAdapter);
-  app.listen(3000);
+  //const redisIoAdapter = new RedisIoAdapter(app);
+  //await redisIoAdapter.connectToRedis();
+  //app.useWebSocketAdapter(redisIoAdapter);
+  app.listen(4000);
 }
 bootstrap();

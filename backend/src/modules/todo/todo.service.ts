@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Server, Socket } from 'socket.io';
 
 import { ToDo, ToDoDocument } from './todo.schema';
 import { CreateTodoDto } from './dtos/create-todo.dto';
@@ -18,20 +17,11 @@ import { UserDocument } from '../user/user.schema';
 export class TodoService {
   private messages: string[] = [];
 
-  private io: Server;
   constructor(
     @InjectModel(ToDo.name) private readonly todoModel: Model<ToDo>,
     private userService: UserService,
-    private notificationService: NotificationService, 
-  ) {
-    this.io = new Server();
-    this.io.attach(3001);
-    this.io.use((socket, next) => {
-        socket.conn.transport.once('headers', (headers) => {
-            headers['set-cookie'] ="sess=test;"; });
-        next();
-    });
-  }
+    private notificationService: NotificationService,
+  ) {}
 
   async findAll(): Promise<ToDoDocument[]> {
     return this.todoModel.find().populate("owner").exec();
@@ -114,32 +104,6 @@ export class TodoService {
   async handleUserDeletedEvent(id: number): Promise<void> {
     console.log(`I am ToDo Service and User with id:${id} deleted`);
     await this.todoModel.deleteMany({ owner: id }).exec();
-  }
-
-  sendMessage(message: string) {
-    this.messages.push(message);
-    this.io.emit('message', message);
-  }
-
-  sendToClient(clientId: string, message: string) {
-    this.io.to(clientId).emit('message', message);
-  }
-
-  getMessages(): string[] {
-    return this.messages;
-  }
-
-  listClients(): string[] {
-    const clients: string[] = [];
-    this.io.sockets.sockets.forEach((socket: Socket) => {
-      console.log(socket.id);
-      console.log(socket.data);
-      const user = socket.data.user;
-      console.log(user);
-      const client = `${socket.id} (${user ? user.email : 'anonymous'})`;
-      clients.push(client);
-    });
-    return clients;
   }
 
 }
