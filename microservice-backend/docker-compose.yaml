@@ -3,8 +3,8 @@ services:
   app:
     container_name: http-api
     build:
-      context: ./
-      dockerfile: ./http-api/Dockerfile
+      context: ./http-api
+      dockerfile: Dockerfile
     environment:
       DATABASE_NAME: nest
       DATABASE_USER: # DATABASE_USER
@@ -15,7 +15,7 @@ services:
     depends_on:
       - user-microservice
       - todo-microservice
-      - mongodb
+      - mongodbApp
     volumes:
       - ./:/usr/src/app
     networks:
@@ -23,7 +23,8 @@ services:
   user-microservice:
     container_name: user-microservice
     build:
-      context: ./
+      context: ./user-service
+      dockerfile: Dockerfile
     environment:
       - REDIS_HOST=redis
     ports:
@@ -31,13 +32,14 @@ services:
     volumes:
       - ./:/usr/src/app
     depends_on:
-      - redis
+      - redisApp
     networks:
       - node-network
   todo-microservice:
     container_name: todo-microservice
     build:
-      context: ./
+      context: ./todo-service
+      dockerfile: Dockerfile
     environment:
       - REDIS_HOST=redis
     ports:
@@ -45,10 +47,10 @@ services:
     volumes:
       - ./:/usr/src/app
     depends_on:
-      - redis
+      - redisApp
     networks:
       - node-network
-  redis:
+  redisApp:
     image: 'redis:latest'
     container_name: redis-microservice
     restart: always
@@ -60,7 +62,7 @@ services:
     command:
       - redis-server
       - '--bind'
-      - redis
+      - redisApp
       - '--port'
       - '6379'
     volumes:
@@ -70,9 +72,9 @@ services:
     networks:
       - node-network
   # start the mongodb service as container
-  mongodb:
+  mongodbApp:
     image: mongo:6.0
-    container_name: mongodb
+    container_name: mongodbApp
     restart: always
     ports:
       - '27017:27017'
@@ -90,5 +92,7 @@ volumes:
     driver: local
 
 networks:
+  redis-net:
+    driver: bridge
   node-network:
     driver: bridge
