@@ -56,6 +56,6 @@ import {
     @Delete()
     async deleteTodo(@Query() query) {
       const Todos = await this.client.send({ cmd: 'deleteTodo' }, query);
-      return Todos;
+      return 0;
     }
   }

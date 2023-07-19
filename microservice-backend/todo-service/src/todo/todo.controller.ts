@@ -71,7 +71,7 @@ export class TodoController {
   @Get('/')
   @UseGuards(AuthGuard)
   async findMyTodos(@Session() session: any) {
-    return this.todoService.findTodosById(session.userId);
+    return this.todoService.findTodosById();
   }
 
   @Get('/main')

@@ -1,0 +1,94 @@
+version: '3'
+services:
+  app:
+    container_name: http-api
+    build:
+      context: ./
+      dockerfile: ./http-api/Dockerfile
+    environment:
+      DATABASE_NAME: nest
+      DATABASE_USER: # DATABASE_USER
+      DATABASE_PASS: # DATABASE_PASS
+      DATABASE_URI: mongodb://mongodb:27017
+    ports:
+      - '4000:4000'
+    depends_on:
+      - user-microservice
+      - todo-microservice
+      - mongodb
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - node-network
+  user-microservice:
+    container_name: user-microservice
+    build:
+      context: ./
+    environment:
+      - REDIS_HOST=redis
+    ports:
+      - '4001:4001'
+    volumes:
+      - ./:/usr/src/app
+    depends_on:
+      - redis
+    networks:
+      - node-network
+  todo-microservice:
+    container_name: todo-microservice
+    build:
+      context: ./
+    environment:
+      - REDIS_HOST=redis
+    ports:
+      - '4002:4002'
+    volumes:
+      - ./:/usr/src/app
+    depends_on:
+      - redis
+    networks:
+      - node-network
+  redis:
+    image: 'redis:latest'
+    container_name: redis-microservice
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - 'REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL'
+    labels:
+      kompose.service.type: nodeport
+    command:
+      - redis-server
+      - '--bind'
+      - redis
+      - '--port'
+      - '6379'
+    volumes:
+      - 'redis_data:/usr/local/etc/redis/redis.conf'
+    ports:
+      - '6379:6379'
+    networks:
+      - node-network
+  # start the mongodb service as container
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./data:/data/db
+    networks:
+      - node-network
+    logging:
+      driver: none
+
+volumes:
+  dbdata6:
+  mongodb:
+  redis_data:
+    driver: local
+
+networks:
+  node-network:
+    driver: bridge

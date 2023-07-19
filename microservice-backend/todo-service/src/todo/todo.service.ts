@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
+import { InjectRedis, DEFAULT_REDIS_NAMESPACE } from '@liaoliaots/nestjs-redis';
+import Redis from 'ioredis';
 import { Model } from 'mongoose';
 import { Server, Socket } from 'socket.io';
 
@@ -11,14 +13,22 @@ import { TodoPayload } from './todo.payload';
 import { UpdateTodoDto } from './dtos/update-todo.dto';
 import { UpdateBoolTodoDto } from './dtos/update-bool.dto';
 
-
 @Injectable()
 export class TodoService {
   private messages: string[] = [];
 
   private io: Server;
-  constructor(@InjectModel(ToDo.name) private readonly todoModel: Model<ToDo>) {}
+  
+  constructor(
+    @InjectRedis(DEFAULT_REDIS_NAMESPACE) private readonly redis: Redis,
+    @InjectModel(ToDo.name) private readonly todoModel: Model<ToDo>
+  ) {
+    this.subscribeToChannel();
+  }
 
+  async subscribeToChannel() {
+    const subscription = await this.redis.subscribe('user-channel');
+  }
   
   @MessagePattern({ cmd: 'getTodos' })
   async findAll(): Promise<ToDoDocument[]> {
@@ -36,8 +46,9 @@ export class TodoService {
   }
 
   @MessagePattern({ cmd: 'getTodosById' })
-  async findTodosById(Id: number): Promise<TodoPayload[]> {
-    const user = await this.userService.findOneById(Id);
+  async findTodosById(): Promise<TodoPayload[]> {
+    const user = await this.redis.get(`user`);
+    console.log(user);
     const todos = await this.todoModel.find({ owner: user }).exec();
     const dueTodos = todos.filter((todo) => todo.due < new Date());
     const approvedTodos = todos.filter((todo) => todo.approved);
@@ -58,26 +69,27 @@ export class TodoService {
         throw new HttpException('ToDo not found',HttpStatus.NOT_FOUND);
       });
 
-    const user = await this.userService.findUser(String(todo.owner));
-    if (user.fullName === req.currentUser.fullName) {
-      if (user.isAdmin) {
-        todo.completed = dto.completed || false
-        todo.approved  = dto.approved  || false
-      }else{
-        todo.completed = dto.completed || false
-      }
-      todo.save();
-      return todo;
-    }else{
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-    }
+    //const user = await this.userService.findUser(String(todo.owner));
+    //if (user.fullName === req.currentUser.fullName) {
+    //  if (user.isAdmin) {
+    //    todo.completed = dto.completed || false
+    //    todo.approved  = dto.approved  || false
+    //  }else{
+    //    todo.completed = dto.completed || false
+    //  }
+    //  todo.save();
+    return todo;
+    //}else{
+    //  throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    //}
   }
 
+  @MessagePattern({ cmd: 'updateTodoField' })
   async create(body: CreateTodoDto, reqUser: number): Promise<ToDo> {
-    const user = await this.userService.findOneById(reqUser); 
+    const user = await this.redis.get(`user`);
     console.log('The User will saved for ToDo:', user);
 
-    body.owner = user._id;
+    //body.owner = user._id;
     body.approved = false;
     body.completed = false;
     console.log('ToDo to be created to save:', body);
