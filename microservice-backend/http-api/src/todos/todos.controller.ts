@@ -16,7 +16,7 @@ import {
   import { TodoDto } from './todo.dto';
   import { CreateTodoDto } from './create-todo.dto';
   
-  @Controller('Todos')
+  @Controller('todos')
   export class TodosController {
     client: ClientProxy;
     logger = new Logger('Todos');

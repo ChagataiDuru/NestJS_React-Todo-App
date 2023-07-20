@@ -12,7 +12,7 @@ import { TodosModule } from './todos/todos.module';
           name: 'SERVICES',
           transport: Transport.REDIS,
           options: {
-            url: 'redis://redisApp:6379',
+            url: process.env.REDIS_URL || 'redis://localhost:6379',
           },
         },
       ]),
