@@ -10,7 +10,7 @@ services:
       DATABASE_USER: # DATABASE_USER
       DATABASE_PASS: # DATABASE_PASS
       DATABASE_URI: mongodb://mongodbApp:27017
-      REDIS_HOST: redisApp
+      REDIS_HOST: redis-microservice
     ports:
       - '4000:4000'
     depends_on:
@@ -19,6 +19,10 @@ services:
       - mongodbApp
     volumes:
       - ./:/usr/src/app
+    links:
+      - redisApp
+    networks:
+      - node-network
   user-microservice:
     container_name: user-microservice
     build:
@@ -29,7 +33,7 @@ services:
       DATABASE_USER: # DATABASE_USER
       DATABASE_PASS: # DATABASE_PASS
       DATABASE_URI: mongodb://mongodbApp:27017
-      REDIS_HOST: redisApp
+      REDIS_HOST: redis-microservice
     depends_on:
       - redisApp
     network_mode: "service:redisApp"

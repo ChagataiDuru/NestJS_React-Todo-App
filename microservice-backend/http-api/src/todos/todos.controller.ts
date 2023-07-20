@@ -24,7 +24,7 @@ import {
       this.client = ClientProxyFactory.create({
         transport: Transport.REDIS,
         options: {
-          url: 'redis://localhost:6379',
+          url: 'redis://redisApp',
         },
       });
     }

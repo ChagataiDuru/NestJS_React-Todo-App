@@ -3,6 +3,7 @@ import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, }
 import {
     ClientProxy,
     ClientProxyFactory,
+    CustomClientOptions,
     Transport,
   } from '@nestjs/microservices';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
@@ -13,18 +14,22 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from './user.schema';
 import { AdminGuard } from 'src/guards/admin.guard';
 
+
+
 @Controller('auth')
 @Serialize(UserDto)
 export class UsersController {
     client: ClientProxy;
+    options: CustomClientOptions = {
+      options: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: 6379,
+      },
+      customClass: undefined
+    };
     logger = new Logger('Users');
     constructor() {
-      this.client = ClientProxyFactory.create({
-        transport: Transport.REDIS,
-        options: {
-          url: 'redis://localhost:6379',
-        },
-      });
+      this.client = ClientProxyFactory.create(this.options);
     }
     
     @Get('/whoami')
