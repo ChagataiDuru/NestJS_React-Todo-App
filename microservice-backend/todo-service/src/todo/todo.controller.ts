@@ -96,7 +96,7 @@ export class TodoController {
   @Get('/:id')
   @UseGuards(AuthGuard)
   findOneById(@Param('id', ParseIntPipe) todoId: number) {
-    return this.todoService.findTodosById(todoId);
+    return this.todoService.findTodosById();
   }
 
   @Put('/edit/:id')

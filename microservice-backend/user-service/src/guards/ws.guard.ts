@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
 import { Socket } from "socket.io";
-import { UserService } from "../modules/user/user.service";
+import { UserService } from "../user/user.service";
 
 @Injectable()
 export class WsAuthenticatedGuard implements CanActivate {

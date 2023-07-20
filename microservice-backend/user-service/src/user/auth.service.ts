@@ -5,6 +5,7 @@ import { plainToClass } from 'class-transformer';
 import { CreateUserDto } from "./dtos/create-user.dto";
 
 import { UserService } from "./user.service";
+import { MessagePattern } from "@nestjs/microservices";
 
 const scrypt = promisify(_scrypt);
 
@@ -12,6 +13,7 @@ const scrypt = promisify(_scrypt);
 export class AuthService {
     constructor(private userService: UserService) {}
 
+    @MessagePattern ({ cmd: 'createUser' })
     async signUp(userDto: CreateUserDto) {
         const user = await this.userService.findOneByEmail(userDto.email);
         if(user){
@@ -29,6 +31,7 @@ export class AuthService {
         return newUser;
     }
     
+    @MessagePattern ({ cmd: 'signin' })
     async signin(email: string, password: string) {
         const user = await this.userService.findOneByEmail(email);
         if (!user) {

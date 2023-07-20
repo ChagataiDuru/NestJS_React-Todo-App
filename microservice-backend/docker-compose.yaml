@@ -9,64 +9,69 @@ services:
       DATABASE_NAME: nest
       DATABASE_USER: # DATABASE_USER
       DATABASE_PASS: # DATABASE_PASS
-      DATABASE_URI: mongodb://mongodb:27017
+      DATABASE_URI: mongodb://mongodbApp:27017
     ports:
       - '4000:4000'
     depends_on:
       - user-microservice
       - todo-microservice
       - mongodbApp
-    volumes:
-      - ./:/usr/src/app
     networks:
       - node-network
+    volumes:
+      - ./:/usr/src/app
   user-microservice:
     container_name: user-microservice
     build:
       context: ./user-service
       dockerfile: Dockerfile
     environment:
-      - REDIS_HOST=redis
+      DATABASE_NAME: nest
+      DATABASE_USER: # DATABASE_USER
+      DATABASE_PASS: # DATABASE_PASS
+      DATABASE_URI: mongodb://mongodbApp:27017
+      REDIS_HOST: redisApp
     ports:
       - '4001:4001'
-    volumes:
-      - ./:/usr/src/app
     depends_on:
       - redisApp
     networks:
       - node-network
+    volumes:
+      - ./:/usr/src/app
   todo-microservice:
     container_name: todo-microservice
     build:
       context: ./todo-service
       dockerfile: Dockerfile
     environment:
-      - REDIS_HOST=redis
+      DATABASE_NAME: nest
+      DATABASE_USER: # DATABASE_USER
+      DATABASE_PASS: # DATABASE_PASS
+      DATABASE_URI: mongodb://mongodbApp:27017
+      REDIS_HOST:  redisApp
     ports:
       - '4002:4002'
-    volumes:
-      - ./:/usr/src/app
     depends_on:
       - redisApp
     networks:
       - node-network
+    volumes:
+      - ./:/usr/src/app
   redisApp:
-    image: 'redis:latest'
+    image: 'redis:alpine'
     container_name: redis-microservice
+    tty: true
     restart: always
     environment:
-      - ALLOW_EMPTY_PASSWORD=yes
+      -  ALLOW_EMPTY_PASSWORD=yes
       - 'REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL'
-    labels:
-      kompose.service.type: nodeport
     command:
       - redis-server
       - '--bind'
       - redisApp
       - '--port'
       - '6379'
-    volumes:
-      - 'redis_data:/usr/local/etc/redis/redis.conf'
     ports:
       - '6379:6379'
     networks:

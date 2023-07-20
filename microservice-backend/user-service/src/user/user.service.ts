@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { User, UserDocument } from './user.schema';
 import { CreateUserDto,UpdateUserInput } from './dtos/create-user.dto';
 import { UserPayload } from './user.payload';
+import { InjectRedis, DEFAULT_REDIS_NAMESPACE } from '@liaoliaots/nestjs-redis';
+import Redis from 'ioredis';
 
 
 @Injectable()
@@ -13,7 +14,7 @@ export class UserService {
     constructor(
     @InjectModel(User.name) 
     private userModel: Model<User>,
-    private eventEmitter: EventEmitter2,
+    @InjectRedis(DEFAULT_REDIS_NAMESPACE) private readonly redis: Redis,
     ) {}
     
       async create(body: any): Promise<User> {
@@ -58,7 +59,7 @@ export class UserService {
       async deleteUser(id: number): Promise<void> {
         console.log('Deleting user...');
         const user = await this.userModel.findOne({ userId: id }).exec()
-        this.eventEmitter.emit('user.deleted', user._id)
+        //this.eventEmitter.emit('user.deleted', user._id)
         await this.userModel.deleteOne({ userId: id })
       }
 

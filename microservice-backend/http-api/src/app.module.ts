@@ -9,10 +9,10 @@ import { TodosModule } from './todos/todos.module';
   imports: [UsersModule, TodosModule,
       ClientsModule.register([
         {
-          name: 'USER_SERVICE',
+          name: 'SERVICES',
           transport: Transport.REDIS,
           options: {
-            url: 'redis://localhost:6379',
+            url: 'redis://redisApp:6379',
           },
         },
       ]),

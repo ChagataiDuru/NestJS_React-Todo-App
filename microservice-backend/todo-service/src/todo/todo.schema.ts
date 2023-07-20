@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument, Document, Types, Schema as MongooseSchema } from 'mongoose'
-import { User, UserDocument } from '../user/user.schema'
 
 export type ToDoDocument = HydratedDocument<ToDo>
 
@@ -24,8 +23,8 @@ export class ToDo extends Document {
     @Prop()
     approved: boolean
 
-    @Prop({type: MongooseSchema.Types.ObjectId , ref: User.name})
-    owner: string | Types.ObjectId | UserDocument
+    @Prop({type: MongooseSchema.Types.ObjectId})
+    owner: string | Types.ObjectId 
 
 }
 
