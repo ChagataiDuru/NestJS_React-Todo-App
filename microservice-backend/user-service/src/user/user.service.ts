@@ -5,16 +5,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
 import { CreateUserDto,UpdateUserInput } from './dtos/create-user.dto';
 import { UserPayload } from './user.payload';
-import { InjectRedis, DEFAULT_REDIS_NAMESPACE } from '@liaoliaots/nestjs-redis';
-import Redis from 'ioredis';
-
 
 @Injectable()
 export class UserService {
     constructor(
     @InjectModel(User.name) 
     private userModel: Model<User>,
-    @InjectRedis(DEFAULT_REDIS_NAMESPACE) private readonly redis: Redis,
     ) {}
     
       async create(body: any): Promise<User> {

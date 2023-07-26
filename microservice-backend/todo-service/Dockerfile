@@ -17,7 +17,7 @@ WORKDIR /app
 
 COPY package.json .
 
-EXPOSE 4002
+EXPOSE 4001
 
 COPY --from=builder /app .
 

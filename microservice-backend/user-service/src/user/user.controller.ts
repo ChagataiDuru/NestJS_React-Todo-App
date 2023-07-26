@@ -1,5 +1,6 @@
 import { Controller, Body, Post, Get, NotFoundException, Param, UseGuards, Session, Delete} from '@nestjs/common';
 import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, } from '@nestjs/swagger';
+import { MessagePattern } from '@nestjs/microservices';
 
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -21,13 +22,11 @@ export class UserController {
         private authService: AuthService
     ) {}
     
-    @Get('/whoami')
     @UseGuards(AuthGuard)
     async whoAmI(@CurrentUser() user: User) {
       return user;
     }
 
-    @Post('/signup')
     @ApiOkResponse({ type: CreateUserDto, description: 'Successfully created user' })
     @ApiBadRequestResponse({ description: 'User with that email already exists.' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error' })
@@ -43,7 +42,6 @@ export class UserController {
       }
     }
   
-    @Post('/signin')
     @ApiOkResponse({ type: LoginUserDto, description: 'Successfully logged in' })
     @ApiBadRequestResponse({ description: 'Bad credentials' })
     async signin(@Body() body: LoginUserDto, @Session() session: any) {
@@ -55,12 +53,10 @@ export class UserController {
       return user;
     }
 
-    @Post('/signout')
     signOut(@Session() session: any) {
       session.userId = null;
     }
 
-    @Get('/users')
     @UseGuards(AuthGuard)
     async getAllUsers() {
         const user = await this.usersService.findAll();
@@ -70,13 +66,11 @@ export class UserController {
         return user;
     }
 
-    @Get('/users/:id')
     @UseGuards(AdminGuard)
     async getUser(@Param('id') id: string) {
         return await this.usersService.findOneById(Number(id));
     }
 
-    @Delete('/users/:id')
     @UseGuards(AdminGuard)
     async deleteUser(@Param('id') id: string) {
         const user = await this.usersService.findOneById(Number(id));

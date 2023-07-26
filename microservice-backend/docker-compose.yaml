@@ -7,10 +7,9 @@ services:
       dockerfile: Dockerfile
     environment:
       DATABASE_NAME: nest
-      DATABASE_USER: # DATABASE_USER
-      DATABASE_PASS: # DATABASE_PASS
       DATABASE_URI: mongodb://mongodbApp:27017
-      REDIS_HOST: redis-microservice
+      USER_SERVICE_HOST: user-microservice
+      TODO_SERVICE_URI: todo-microservice
     ports:
       - '4000:4000'
     depends_on:
@@ -19,8 +18,6 @@ services:
       - mongodbApp
     volumes:
       - ./:/usr/src/app
-    links:
-      - redisApp
     networks:
       - node-network
   user-microservice:
@@ -30,47 +27,26 @@ services:
       dockerfile: Dockerfile
     environment:
       DATABASE_NAME: nest
-      DATABASE_USER: # DATABASE_USER
-      DATABASE_PASS: # DATABASE_PASS
       DATABASE_URI: mongodb://mongodbApp:27017
-      REDIS_HOST: redis-microservice
-    depends_on:
-      - redisApp
-    network_mode: "service:redisApp"
+    ports:
+      - '4002:4002'
     volumes:
       - ./:/usr/src/app
+    networks:
+      - node-network
+
   todo-microservice:
     container_name: todo-microservice
     build:
       context: ./todo-service
       dockerfile: Dockerfile
+    ports:
+      - '4001:4001'
     environment:
       DATABASE_NAME: nest
-      DATABASE_USER: # DATABASE_USER
-      DATABASE_PASS: # DATABASE_PASS
       DATABASE_URI: mongodb://mongodbApp:27017
-      REDIS_HOST:  redisApp
-    depends_on:
-      - redisApp
-    network_mode: "service:redisApp"
     volumes:
       - ./:/usr/src/app
-  redisApp:
-    image: 'redis:alpine'
-    container_name: redis-microservice
-    tty: true
-    restart: always
-    environment:
-      -  ALLOW_EMPTY_PASSWORD=yes
-      - 'REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL'
-    command:
-      - redis-server
-      - '--bind'
-      - 0.0.0.0
-      - '--port'
-      - '6379'
-    ports:
-      - '6379:6379'
     networks:
       - node-network
 
@@ -88,13 +64,8 @@ services:
       driver: none
 
 volumes:
-  dbdata6:
   mongodb:
-  redis_data:
-    driver: local
 
 networks:
-  redis-net:
-    driver: bridge
   node-network:
     driver: bridge

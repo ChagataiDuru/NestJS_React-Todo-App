@@ -1,11 +1,6 @@
-import { Controller, Body, Post, Get, NotFoundException, Param, UseGuards, Session, Delete, Logger} from '@nestjs/common';
+import { Controller, Body, Post, Get, NotFoundException, Param, UseGuards, Session, Delete, Logger, Inject} from '@nestjs/common';
 import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, } from '@nestjs/swagger';
-import {
-    ClientProxy,
-    ClientProxyFactory,
-    CustomClientOptions,
-    Transport,
-  } from '@nestjs/microservices';
+import { ClientProxy } from '@nestjs/microservices';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { LoginUserDto } from './dtos/login-user.dto'; 
@@ -19,18 +14,10 @@ import { AdminGuard } from 'src/guards/admin.guard';
 @Controller('auth')
 @Serialize(UserDto)
 export class UsersController {
-    client: ClientProxy;
-    options: CustomClientOptions = {
-      options: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: 6379,
-      },
-      customClass: undefined
-    };
-    logger = new Logger('Users');
-    constructor() {
-      this.client = ClientProxyFactory.create(this.options);
-    }
+    logger = new Logger('Users-MicroService');
+    constructor(
+      @Inject('USER_SERVICE') private client: ClientProxy,
+    ) {}
     
     @Get('/whoami')
     async whoAmI(@CurrentUser() user: User) {
@@ -43,9 +30,10 @@ export class UsersController {
     @ApiInternalServerErrorResponse({ description: 'Internal server error' })
     async createUser(@Body() body: CreateUserDto, @Session() session: any) {
       try {
+        console.log('APISERVER: UserDto:', body);
         const user = await new Promise<UserDto>((resolve, reject) => {
             this.client.send({ cmd: 'createUser' }, body).subscribe({
-              next: (user: UserDto) => {
+              next: (user: any) => {
                 resolve(user);
               },
               error: (error: any) => {

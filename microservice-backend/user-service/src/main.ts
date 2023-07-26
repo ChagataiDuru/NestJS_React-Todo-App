@@ -1,21 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
-
 const logger = new Logger('UserService');
 
+const microserviceOptions = {
+  transport: Transport.TCP,
+  options: {
+    host: '0.0.0.0',
+    port: 4002,
+  },
+};
+
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+  const app = await NestFactory.createMicroservice(
     AppModule,
-    {
-      transport: Transport.REDIS,
-      options: {
-        url: 'redis://localhost:6379',
-      }
-    }
+    microserviceOptions,
   )  
-  app.listen().then(() => {
+  app.useLogger(logger)
+  await app.listen().then(() => {
     logger.log('User microservice is listening ... ');
   });
 }

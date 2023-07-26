@@ -44,7 +44,7 @@ export class TodoController {
   @ApiBadRequestResponse({ description: 'Bad request' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   create(@Body() todo: CreateTodoDto, @Session() session: any) {
-    return this.todoService.create(todo, session.userId);
+    //return this.todoService.create(todo, session.userId);
   }
 
   @Get('message')
@@ -71,7 +71,7 @@ export class TodoController {
   @Get('/')
   @UseGuards(AuthGuard)
   async findMyTodos(@Session() session: any) {
-    return this.todoService.findTodosById();
+    //return this.todoService.findTodosById();
   }
 
   @Get('/main')
@@ -96,7 +96,7 @@ export class TodoController {
   @Get('/:id')
   @UseGuards(AuthGuard)
   findOneById(@Param('id', ParseIntPipe) todoId: number) {
-    return this.todoService.findTodosById();
+    //return this.todoService.findTodosById();
   }
 
   @Put('/edit/:id')

@@ -13,25 +13,26 @@ const scrypt = promisify(_scrypt);
 export class AuthService {
     constructor(private userService: UserService) {}
 
-    @MessagePattern ({ cmd: 'createUser' })
+    @MessagePattern({ cmd: 'createUser' })
     async signUp(userDto: CreateUserDto) {
-        const user = await this.userService.findOneByEmail(userDto.email);
-        if(user){
-            throw new BadRequestException('User with this email already exists');
-        }
-        const salt = randomBytes(8).toString('hex');
-        const hash = (await scrypt(userDto.password, salt, 32)) as Buffer;
-        const result = salt + '.' + hash.toString('hex');
+      console.log('UserDto:', userDto);
+      const user = await this.userService.findOneByEmail(userDto.email);
+      if(user){
+          throw new BadRequestException('User with this email already exists');
+      }
+      const salt = randomBytes(8).toString('hex');
+      const hash = (await scrypt(userDto.password, salt, 32)) as Buffer;
+      const result = salt + '.' + hash.toString('hex');
 
-        const userDtoInstance = plainToClass(CreateUserDto, {userDto, password: result});
+      const userDtoInstance = plainToClass(CreateUserDto, {userDto, password: result});
 
-        console.log('User to dto instance:', userDtoInstance);
+      console.log('User to dto instance:', userDtoInstance);
 
-        const newUser = await this.userService.create(userDtoInstance);
-        return newUser;
+      const newUser = await this.userService.create(userDtoInstance);
+      return newUser;
     }
     
-    @MessagePattern ({ cmd: 'signin' })
+    @MessagePattern({ cmd: 'signin' })
     async signin(email: string, password: string) {
         const user = await this.userService.findOneByEmail(email);
         if (!user) {

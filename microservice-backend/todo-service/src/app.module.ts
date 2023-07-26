@@ -8,17 +8,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [TodoModule,
-    RedisModule.forRoot({
-      config: {
-        name: 'TODO_SERVICE',
-        host: process.env.REDIS_HOST,
-        port: 6379,
-        onClientCreated(client) {
-          client.on('error', err => {});
-          client.on('ready', () => {});
-        },
-      }
-    }),
     MongooseModule.forRoot(process.env.DATABASE_URI, 
       {
         dbName: process.env.DATABASE_NAME,
