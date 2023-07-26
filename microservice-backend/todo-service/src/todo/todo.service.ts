@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { MessagePattern, Transport,ClientTCP } from '@nestjs/microservices';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -14,14 +14,16 @@ import { UpdateBoolTodoDto } from './dtos/update-bool.dto';
 @Injectable()
 export class TodoService {
   private messages: string[] = [];
-
   private io: Server;
-  
+  private client: ClientTCP;
   constructor(
     @InjectModel(ToDo.name) private readonly todoModel: Model<ToDo>
-  ) {}
+  ) {
+    this.client = new ClientTCP({
+      
+    });
+  }
   
-  @MessagePattern({ cmd: 'getTodos' })
   async findAll(): Promise<ToDoDocument[]> {
     return this.todoModel.find().populate("owner").exec();
   }
@@ -36,7 +38,7 @@ export class TodoService {
     return this.todoModel.findById(id).exec();
   }
 
-/*   @MessagePattern({ cmd: 'getTodosById' })
+  @MessagePattern({ cmd: 'getTodosById' })
   async findTodosById(): Promise<TodoPayload[]> {
     const user = await this.io.get(`user`);
     console.log(user);
@@ -45,7 +47,7 @@ export class TodoService {
     const approvedTodos = todos.filter((todo) => todo.approved);
     console.log(approvedTodos);
     return todos
-  } */
+  }
 
   @MessagePattern({ cmd: 'listApproveTodos' })
   async listApproveTodos(bool: boolean): Promise<ToDo[]> {
@@ -59,8 +61,7 @@ export class TodoService {
         console.log(error)
         throw new HttpException('ToDo not found',HttpStatus.NOT_FOUND);
       });
-      return todo;
-/*     const user = await this.userService.findUser(String(todo.owner));
+    const user = await this.userService.findUser(String(todo.owner));
     if (user.fullName === req.currentUser.fullName) {
       if (user.isAdmin) {
         todo.completed = dto.completed || false
@@ -69,12 +70,13 @@ export class TodoService {
         todo.completed = dto.completed || false
       }
       todo.save();
+      return todo;
     }else{
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-    } */
+    }
   }
 
-/*   @MessagePattern({ cmd: 'updateTodoField' })
+  @MessagePattern({ cmd: 'updateTodoField' })
   async create(body: CreateTodoDto, reqUser: number): Promise<ToDo> {
     const user = await this.redis.get(`user`);
     console.log('The User will saved for ToDo:', user);
@@ -93,7 +95,7 @@ export class TodoService {
       console.error('Error saving todo:', error);
       throw error;
     }
-  } */
+  }
 
   async update(id: string, todo: UpdateTodoDto): Promise<TodoPayload> {
     return this.todoModel.findByIdAndUpdate(id, todo, { new: true }).exec();

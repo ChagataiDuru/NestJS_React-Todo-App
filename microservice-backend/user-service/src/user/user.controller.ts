@@ -22,11 +22,11 @@ export class UserController {
         private authService: AuthService
     ) {}
     
-    @UseGuards(AuthGuard)
     async whoAmI(@CurrentUser() user: User) {
       return user;
     }
 
+    @MessagePattern({ cmd: 'createUser' })
     @ApiOkResponse({ type: CreateUserDto, description: 'Successfully created user' })
     @ApiBadRequestResponse({ description: 'User with that email already exists.' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error' })
@@ -34,7 +34,6 @@ export class UserController {
       try {
         const user = await this.authService.signUp(body);
         console.log('Signed Up User:', user);
-        session.userId = user.userId;
         return user;
       } catch (error) {
         console.log('Error:', error);
@@ -42,22 +41,15 @@ export class UserController {
       }
     }
   
+    @MessagePattern({ cmd: 'signin' })
     @ApiOkResponse({ type: LoginUserDto, description: 'Successfully logged in' })
     @ApiBadRequestResponse({ description: 'Bad credentials' })
     async signin(@Body() body: LoginUserDto, @Session() session: any) {
       const user = await this.authService.signin(body.email, body.password);
-      
-      session.userId = user.userId;
-      session.isAdmin = user.isAdmin;
-
       return user;
     }
 
-    signOut(@Session() session: any) {
-      session.userId = null;
-    }
-
-    @UseGuards(AuthGuard)
+    @MessagePattern({ cmd: 'getAllUsers' })
     async getAllUsers() {
         const user = await this.usersService.findAll();
         if (!user) {
@@ -66,12 +58,12 @@ export class UserController {
         return user;
     }
 
-    @UseGuards(AdminGuard)
+    @MessagePattern({ cmd: 'getUser' })
     async getUser(@Param('id') id: string) {
         return await this.usersService.findOneById(Number(id));
     }
 
-    @UseGuards(AdminGuard)
+    @MessagePattern({ cmd: 'deleteUser' })
     async deleteUser(@Param('id') id: string) {
         const user = await this.usersService.findOneById(Number(id));
         if (user) {

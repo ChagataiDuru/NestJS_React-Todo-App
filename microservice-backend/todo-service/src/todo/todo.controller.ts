@@ -29,6 +29,7 @@ import { TodoDto } from './dtos/todo.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UpdateBoolTodoDto } from './dtos/update-bool.dto';
+import { MessagePattern } from '@nestjs/microservices';
 
 @Controller('todos')
 @Serialize(TodoDto)
@@ -36,7 +37,6 @@ export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
   @Post('/create')
-  @UseGuards(AuthGuard)
   @ApiOkResponse({
     type: CreateTodoDto,
     description: 'Successfully created todo',
@@ -47,60 +47,45 @@ export class TodoController {
     //return this.todoService.create(todo, session.userId);
   }
 
-  @Get('message')
+  
   getMessages(): string[] {
     return this.todoService.getMessages();
   }
 
-  @Post('message/:message')
   sendMessage(@Param('message') message: string) {
     this.todoService.sendMessage(message);
   }
 
-  @Get('client')
   listClients(): string[] {
     return this.todoService.listClients();
   }
 
-  @Get('/all')
-  @UseGuards(AdminGuard)
   findAll() {
     return this.todoService.findAll();
   }
 
-  @Get('/')
-  @UseGuards(AuthGuard)
   async findMyTodos(@Session() session: any) {
     //return this.todoService.findTodosById();
   }
 
-  @Get('/main')
-  @UseGuards(AuthGuard)
   listApprovedTodos() {
     return this.todoService.listApproveTodos(true);
   }
 
-  @Get('/list/?')
-  @UseGuards(AdminGuard)
   findUnApprovedTodos(@Query('approved', ParseBoolPipe) isApproved: boolean) {
     console.log(isApproved);
     return this.todoService.listApproveTodos(isApproved);
   }
 
-  @Put('/:id/?')
-  @UseGuards(AuthGuard)
   updateDoneTodo(@Body() dto: UpdateBoolTodoDto,@Req() req: any, @Param('id', ParseIntPipe) todoId: number) {
     return this.todoService.updateField(req, todoId,dto);
   }
 
-  @Get('/:id')
   @UseGuards(AuthGuard)
   findOneById(@Param('id', ParseIntPipe) todoId: number) {
     //return this.todoService.findTodosById();
   }
 
-  @Put('/edit/:id')
-  @UseGuards(AuthGuard)
   @ApiOkResponse({
     type: UpdateTodoDto,
     description: 'Successfully updated todo',
@@ -111,8 +96,7 @@ export class TodoController {
     return this.todoService.update(todoId, todo);
   }
 
-  @Delete('/:id')
-  @UseGuards(AuthGuard)
+  @MessagePattern({ cmd: 'deleteTodo' })
   @ApiOkResponse({ description: 'Successfully deleted todo' })
   @ApiBadRequestResponse({ description: 'Bad request' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })

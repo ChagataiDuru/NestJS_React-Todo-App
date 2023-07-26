@@ -13,7 +13,6 @@ const scrypt = promisify(_scrypt);
 export class AuthService {
     constructor(private userService: UserService) {}
 
-    @MessagePattern({ cmd: 'createUser' })
     async signUp(userDto: CreateUserDto) {
       console.log('UserDto:', userDto);
       const user = await this.userService.findOneByEmail(userDto.email);
@@ -32,7 +31,6 @@ export class AuthService {
       return newUser;
     }
     
-    @MessagePattern({ cmd: 'signin' })
     async signin(email: string, password: string) {
         const user = await this.userService.findOneByEmail(email);
         if (!user) {
