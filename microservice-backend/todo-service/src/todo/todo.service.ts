@@ -48,7 +48,7 @@ export class TodoService {
     return this.todoModel.findOne({ todoId: id}).exec();
   }
 
-  async findTodosById(user: any): Promise<TodoPayload[]> {
+  async findTodosByUser(user: any): Promise<TodoPayload[]> {
     console.log(user);
     const todos = await this.todoModel.find({ owner: user }).exec();
     const dueTodos = todos.filter((todo) => todo.due < new Date());
@@ -80,12 +80,12 @@ export class TodoService {
       return todo;
   }
 
-  async update(id: string, todo: UpdateTodoDto): Promise<TodoPayload> {
-    return this.todoModel.findByIdAndUpdate(id, todo, { new: true }).exec();
+  async update(id: number, todo: UpdateTodoDto): Promise<TodoPayload> {
+    return this.todoModel.findOneAndUpdate({ todoId: id }, todo).exec();
   }
 
-  async delete(id: string): Promise<void> {
-    await this.todoModel.findByIdAndDelete(id).exec();
+  async delete(id: number): Promise<void> {
+    await this.todoModel.findOneAndDelete({ todoId: id }).exec();
   }
 
   @OnEvent('user.deleted', { async: true })

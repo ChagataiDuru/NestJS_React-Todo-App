@@ -110,26 +110,23 @@ export class TodoController {
   }
 
   @MessagePattern({ cmd: 'findOneTodo' })
-  findOneById(data: {todoId: string}) {
-    return this.todoService.findTodosById(data);
+  findOneById(data: {todoId: number}) {
+    return this.todoService.findOneById(data.todoId);
   }
 
   @MessagePattern({ cmd: 'updateTodo' })
-  @ApiOkResponse({
-    type: UpdateTodoDto,
-    description: 'Successfully updated todo',
-  })
+  @ApiOkResponse({type: UpdateTodoDto,description: 'Successfully updated todo',})
   @ApiBadRequestResponse({ description: 'Bad request' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  update(@Param('id') todoId: string, @Body() todo: ToDo) {
-    return this.todoService.update(todoId, todo);
+  update(data: { todoId: number, todo: UpdateTodoDto }) {
+    return this.todoService.update(data.todoId, data.todo);
   }
 
   @MessagePattern({ cmd: 'deleteTodo' })
   @ApiOkResponse({ description: 'Successfully deleted todo' })
   @ApiBadRequestResponse({ description: 'Bad request' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  delete(@Param('id') todoId: string): Promise<void> {
-    return this.todoService.delete(todoId);
+  delete(data: {todoId: number}): Promise<void> {
+    return this.todoService.delete(data.todoId);
   }
 }
