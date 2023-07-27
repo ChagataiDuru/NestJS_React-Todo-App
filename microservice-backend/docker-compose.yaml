@@ -20,20 +20,6 @@ services:
       - ./:/usr/src/app
     networks:
       - node-network
-  user-microservice:
-    container_name: user-microservice
-    build:
-      context: ./user-service
-      dockerfile: Dockerfile
-    environment:
-      DATABASE_NAME: nest
-      DATABASE_URI: mongodb://mongodbApp:27017
-    ports:
-      - '4002:4002'
-    volumes:
-      - ./:/usr/src/app
-    networks:
-      - node-network
 
   todo-microservice:
     container_name: todo-microservice
@@ -45,6 +31,25 @@ services:
     environment:
       DATABASE_NAME: nest
       DATABASE_URI: mongodb://mongodbApp:27017
+      USER_SERVICE_HOST: user-microservice
+      TODO_SERVICE_URI: todo-microservice
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - node-network
+
+  user-microservice:
+    container_name: user-microservice
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_NAME: nest
+      DATABASE_URI: mongodb://mongodbApp:27017
+      USER_SERVICE_HOST: user-microservice
+      TODO_SERVICE_URI: todo-microservice
+    ports:
+      - '4002:4002'
     volumes:
       - ./:/usr/src/app
     networks:

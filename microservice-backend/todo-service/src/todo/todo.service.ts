@@ -15,73 +15,12 @@ import { UpdateBoolTodoDto } from './dtos/update-bool.dto';
 export class TodoService {
   private messages: string[] = [];
   private io: Server;
-  private client: ClientTCP;
-  constructor(
-    @InjectModel(ToDo.name) private readonly todoModel: Model<ToDo>
-  ) {
-    this.client = new ClientTCP({
-      
-    });
-  }
+  constructor(@InjectModel(ToDo.name) private readonly todoModel: Model<ToDo>) {}
   
-  async findAll(): Promise<ToDoDocument[]> {
-    return this.todoModel.find().populate("owner").exec();
-  }
-
-  @MessagePattern({ cmd: 'getTodosByOwner' })
-  async findOneByOwner(owner: any): Promise<ToDoDocument[]> {
-    return this.todoModel.find({ owner: owner }).exec();
-  }
-
-  @MessagePattern({ cmd: 'getTodosByObjectId' })
-  async findOneById(id: string): Promise<ToDoDocument> {
-    return this.todoModel.findById(id).exec();
-  }
-
-  @MessagePattern({ cmd: 'getTodosById' })
-  async findTodosById(): Promise<TodoPayload[]> {
-    const user = await this.io.get(`user`);
-    console.log(user);
-    const todos = await this.todoModel.find({ owner: user }).exec();
-    const dueTodos = todos.filter((todo) => todo.due < new Date());
-    const approvedTodos = todos.filter((todo) => todo.approved);
-    console.log(approvedTodos);
-    return todos
-  }
-
-  @MessagePattern({ cmd: 'listApproveTodos' })
-  async listApproveTodos(bool: boolean): Promise<ToDo[]> {
-    return await this.todoModel.find({ approved: bool }).exec();
-  }
-
-  @MessagePattern({ cmd: 'updateTodoField' })
-  async updateField(req: any, Id: number,dto: UpdateBoolTodoDto): Promise<TodoPayload> {
-    const todo = await this.todoModel.findOne({todoId : Id}).exec().catch((error) =>
-      {
-        console.log(error)
-        throw new HttpException('ToDo not found',HttpStatus.NOT_FOUND);
-      });
-    const user = await this.userService.findUser(String(todo.owner));
-    if (user.fullName === req.currentUser.fullName) {
-      if (user.isAdmin) {
-        todo.completed = dto.completed || false
-        todo.approved  = dto.approved  || false
-      }else{
-        todo.completed = dto.completed || false
-      }
-      todo.save();
-      return todo;
-    }else{
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-    }
-  }
-
-  @MessagePattern({ cmd: 'updateTodoField' })
-  async create(body: CreateTodoDto, reqUser: number): Promise<ToDo> {
-    const user = await this.redis.get(`user`);
+  async create(body: CreateTodoDto,user: any): Promise<ToDo> {
     console.log('The User will saved for ToDo:', user);
 
-    //body.owner = user._id;
+    body.owner = user._id;
     body.approved = false;
     body.completed = false;
     console.log('ToDo to be created to save:', body);
@@ -95,6 +34,50 @@ export class TodoService {
       console.error('Error saving todo:', error);
       throw error;
     }
+  }
+
+  async findAll(): Promise<ToDoDocument[]> {
+    return this.todoModel.find().populate("owner").exec();
+  }
+
+  async findOneByOwner(owner: any): Promise<ToDoDocument[]> {
+    return this.todoModel.find({ owner: owner }).exec();
+  }
+
+  async findOneById(id: number): Promise<ToDoDocument> {
+    return this.todoModel.findOne({ todoId: id}).exec();
+  }
+
+  async findTodosById(user: any): Promise<TodoPayload[]> {
+    console.log(user);
+    const todos = await this.todoModel.find({ owner: user }).exec();
+    const dueTodos = todos.filter((todo) => todo.due < new Date());
+    const approvedTodos = todos.filter((todo) => todo.approved);
+    console.log(approvedTodos);
+    return todos
+  }
+
+  async listApproveTodos(bool: boolean): Promise<ToDo[]> {
+    return await this.todoModel.find({ approved: bool }).exec();
+  }
+
+  async updateField(dto: UpdateBoolTodoDto,Id: number,user: any): Promise<TodoPayload> {
+    const todo = await this.todoModel.findOne({todoId : Id}).exec().catch((error) =>
+    {
+      console.log(error)
+      throw new HttpException('ToDo not found',HttpStatus.NOT_FOUND);
+    });
+    
+      if (user.isAdmin) {
+        todo.completed = dto.completed || false
+        todo.approved  = dto.approved  || false
+      }else if(user._id === todo.owner){
+        todo.completed = dto.completed || false
+      }else{
+        throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+      }
+      todo.save();
+      return todo;
   }
 
   async update(id: string, todo: UpdateTodoDto): Promise<TodoPayload> {

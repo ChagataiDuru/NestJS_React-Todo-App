@@ -1,9 +1,5 @@
 import {
   Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
   Param,
   Body,
   UseGuards,
@@ -17,75 +13,108 @@ import {
   ApiBadRequestResponse,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
-  ApiTags,
 } from '@nestjs/swagger';
-
-import { AuthGuard } from 'src/guards/auth.guard';
+import { ClientProxy, ClientProxyFactory, MessagePattern,Transport } from '@nestjs/microservices';
 import { TodoService } from './todo.service';
 import { ToDo } from './todo.schema';
 import { CreateTodoDto } from './dtos/create-todo.dto';
 import { UpdateTodoDto } from './dtos/update-todo.dto';
 import { TodoDto } from './dtos/todo.dto';
-import { AdminGuard } from 'src/guards/admin.guard';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UpdateBoolTodoDto } from './dtos/update-bool.dto';
-import { MessagePattern } from '@nestjs/microservices';
+import session from 'express-session';
 
 @Controller('todos')
 @Serialize(TodoDto)
 export class TodoController {
-  constructor(private readonly todoService: TodoService) {}
+  private userClient : ClientProxy
+  constructor(private readonly todoService: TodoService) {
+    try {
+      this.userClient = ClientProxyFactory.create({
+        transport: Transport.TCP,
+        options: {
+          host: process.env.USER_SERVICE_HOST || 'localhost',
+          port: 4002,
+        },
+      });
+    } catch (error) {
+      console.error(error.message);
+      if (error.code === 'ECONNREFUSED') {
+        setTimeout(() => {
+          this.userClient = ClientProxyFactory.create({
+            transport: Transport.TCP,
+            options: {
+              host: process.env.USER_SERVICE_HOST || 'localhost',
+              port: 4002,
+            },
+          });
+        }, 5000);
+      } else if (error.code === 'ENOTFOUND') {
+        throw new Error('User service not found');
+      } else {
+        throw error;
+      }
+    }
+  }
 
-  @Post('/create')
+  @MessagePattern({ cmd: 'createTodo' },)
   @ApiOkResponse({
     type: CreateTodoDto,
     description: 'Successfully created todo',
   })
   @ApiBadRequestResponse({ description: 'Bad request' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  create(@Body() todo: CreateTodoDto, @Session() session: any) {
-    //return this.todoService.create(todo, session.userId);
+  create(data: { todo: CreateTodoDto, user: any }) {
+    console.log(data);
+    return this.todoService.create(data.todo,data.user);
   }
 
   
+  @MessagePattern({ cmd: 'getMessages' })
   getMessages(): string[] {
     return this.todoService.getMessages();
   }
 
+  @MessagePattern({ cmd: 'sendMessage' })
   sendMessage(@Param('message') message: string) {
     this.todoService.sendMessage(message);
   }
 
+  @MessagePattern({ cmd: 'listClients' })
   listClients(): string[] {
     return this.todoService.listClients();
   }
 
+  @MessagePattern({ cmd: 'findAllTodos' })
   findAll() {
     return this.todoService.findAll();
   }
 
-  async findMyTodos(@Session() session: any) {
-    //return this.todoService.findTodosById();
+  @MessagePattern({ cmd: 'findMyTodos' })
+  async findMyTodos(@Body() user: any) {
+    return this.todoService.findOneByOwner(user);
   }
 
+  @MessagePattern({ cmd: 'approvedTodos' })
   listApprovedTodos() {
     return this.todoService.listApproveTodos(true);
   }
 
-  findUnApprovedTodos(@Query('approved', ParseBoolPipe) isApproved: boolean) {
+  findUnApprovedTodos(isApproved: boolean) {
     console.log(isApproved);
     return this.todoService.listApproveTodos(isApproved);
   }
 
-  updateDoneTodo(@Body() dto: UpdateBoolTodoDto,@Req() req: any, @Param('id', ParseIntPipe) todoId: number) {
-    return this.todoService.updateField(req, todoId,dto);
+  updateDoneTodo(data: {dto: UpdateBoolTodoDto,todoId: number,user: any}) {
+    return this.todoService.updateField(data.dto, data.todoId , data.user);
   }
 
-  @UseGuards(AuthGuard)
-  findOneById(@Param('id', ParseIntPipe) todoId: number) {
-    //return this.todoService.findTodosById();
+  @MessagePattern({ cmd: 'findOneTodo' })
+  findOneById(data: {todoId: string}) {
+    return this.todoService.findTodosById(data);
   }
 
+  @MessagePattern({ cmd: 'updateTodo' })
   @ApiOkResponse({
     type: UpdateTodoDto,
     description: 'Successfully updated todo',

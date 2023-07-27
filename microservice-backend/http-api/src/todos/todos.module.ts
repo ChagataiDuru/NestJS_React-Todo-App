@@ -9,7 +9,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'TODO_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: process.env.TODO_SERVICE_HOST || 'localhost',
+          host: 'todo-microservice',
           port: 4001,
         },  
       },

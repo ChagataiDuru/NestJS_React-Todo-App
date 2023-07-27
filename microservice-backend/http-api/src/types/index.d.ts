@@ -2,6 +2,7 @@ export {};
 
 declare module 'express-session' {
     interface SessionData {
+        user: any;
         userId: number;
         isAdmin: boolean;
     }

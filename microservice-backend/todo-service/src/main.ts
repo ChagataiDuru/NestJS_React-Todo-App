@@ -17,6 +17,7 @@ async function bootstrap() {
     AppModule,
     microserviceOptions,
   )  
+  app.useLogger(logger)
   app.listen().then(() => {
     logger.log('Todo microservice is listening ... ');
   });

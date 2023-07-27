@@ -8,6 +8,7 @@ import { UserDto } from './dtos/user.dto';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from './user.schema';
 import { AdminGuard } from 'src/guards/admin.guard';
+import session from 'express-session';
 
 
 
@@ -20,8 +21,9 @@ export class UsersController {
     ) {}
     
     @Get('/whoami')
-    async whoAmI(@CurrentUser() user: User) {
-      return user;
+    async whoAmI(@Session() session: any) {
+      console.log(this.client)
+      return session.user;
     }
 
     @Post('/signup')
@@ -30,7 +32,6 @@ export class UsersController {
     @ApiInternalServerErrorResponse({ description: 'Internal server error' })
     async createUser(@Body() body: CreateUserDto, @Session() session: any) {
       try {
-        console.log('APISERVER: UserDto:', body);
         const user = await new Promise<UserDto>((resolve, reject) => {
             this.client.send({ cmd: 'createUser' }, body).subscribe({
               next: (user: any) => {
@@ -42,9 +43,10 @@ export class UsersController {
             });
           });        
         console.log('Signed Up User:', user);
+        session.user = user
         session.userId = user.userId;
         return user;
-      } catch (error) {
+      }catch (error) {
         console.log('Error:', error);
         throw error;
       }
@@ -64,6 +66,7 @@ export class UsersController {
           },
         });
       });  
+      session.user = user;
       session.userId = user.userId;
       session.isAdmin = user.isAdmin;
 
@@ -72,6 +75,7 @@ export class UsersController {
 
     @Post('/signout')
     signOut(@Session() session: any) {
+      session.user = null;
       session.userId = null;
     }
 
