@@ -155,6 +155,40 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   }
 
   //@UseGuards(WsAuthenticatedGuard)
-  
-
+  @SubscribeMessage('update-todo')
+  private async handleUpdateTodo(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() todo: any,
+  ): Promise<void> {
+    this.logger.log(`Client ${socket.id} sent: update-todo`);
+    const id = Number(socket.handshake.headers.userid); 
+    this.logger.log(socket.handshake.headers.userid); 
+    const user = await new Promise<UserDto>((resolve, reject) => {
+      this.userClient.send({ cmd: 'getUser' }, {userid: id}).subscribe({
+        next: (user: UserDto) => {
+          resolve(user);
+        },
+        error: (error: any) => {
+          reject(error);
+        },
+      });
+    });
+    const serverTodo = 
+    {
+        title: todo.title,
+        description: todo.text,
+        due: todo.dueDate
+    };
+    const updatedTodo = await new Promise<TodoDto>((resolve, reject) => {
+      this.todoClient.send({ cmd: 'updateTodo' }, {todo: serverTodo, user: user}).subscribe({
+        next: (todo: TodoDto) => {
+          resolve(todo);
+        },
+        error: (error: any) => {
+          reject(error);
+        },
+      });
+    });
+    this.server.sockets.emit('update-todo', updatedTodo);
+  }
 }
