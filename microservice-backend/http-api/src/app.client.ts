@@ -16,11 +16,12 @@ export class AppClient {
     try {
       
       let option = '';
-      while (option !== '3') {
+      while (option !== '4') {
         console.log('Select an option:');
         console.log('1 - Get all todos');
         console.log('2 - Create todo');
-        console.log('3 - Sign out');
+        console.log('3 - Profile');
+        console.log('4 - Sign out');
         option = await this.prompt(rl, '');
   
         switch (option) {
@@ -47,6 +48,9 @@ export class AppClient {
               this.createTodo(todo);
               break;
           case '3':
+            this.whoAmI();
+            break;
+          case '4':
             this.signOut();
             break;
           default:
@@ -66,9 +70,7 @@ export class AppClient {
       withCredentials: true,
       transportOptions: {
         polling: {
-          extraHeaders: {
-            userId: 0,
-          }
+          extraHeaders: {}
         }
       }
     };
@@ -97,8 +99,14 @@ export class AppClient {
     this.socket.on('message', (message: string) => {
       console.log(`Received message: ${message}`);
     });
+    this.socket.on('whoami', (userId: string) => {
+      console.log(`Received userId: ${JSON.stringify(userId,null, 2)}`);
+    });
     this.socket.on('get-todos', (todos: string[]) => {
       console.table(`Received todos: ${JSON.stringify(todos,null, 2)}`);
+    });
+    this.socket.on('create-todo', (todo: string) => {
+      console.log(`Created todo: ${JSON.stringify(todo,null, 2)}`);
     });
     return this.socketOptions.transportOptions.polling.extraHeaders.userId
   }
@@ -107,6 +115,9 @@ export class AppClient {
     this.socket.disconnect();
   }
 
+  private whoAmI() {
+    this.socket.emit('whoami');
+  }
   private getTodos() {
     this.socket.emit('get-todos');
   }
@@ -114,6 +125,7 @@ export class AppClient {
     this.socket.emit('create-todo', todo);
   }
   private async signOut() {
+    console.log('Signing out...');
     this.disconnect();
     process.exit();
   }

@@ -52,15 +52,16 @@ var AppClient = /** @class */ (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        _b.trys.push([0, 14, , 15]);
+                        _b.trys.push([0, 15, , 16]);
                         option = '';
                         _b.label = 1;
                     case 1:
-                        if (!(option !== '3')) return [3 /*break*/, 13];
+                        if (!(option !== '4')) return [3 /*break*/, 14];
                         console.log('Select an option:');
                         console.log('1 - Get all todos');
                         console.log('2 - Create todo');
-                        console.log('3 - Sign out');
+                        console.log('3 - Profile');
+                        console.log('4 - Sign out');
                         return [4 /*yield*/, this.prompt(rl, '')];
                     case 2:
                         option = _b.sent();
@@ -69,11 +70,12 @@ var AppClient = /** @class */ (function () {
                             case '1': return [3 /*break*/, 3];
                             case '2': return [3 /*break*/, 4];
                             case '3': return [3 /*break*/, 10];
+                            case '4': return [3 /*break*/, 11];
                         }
-                        return [3 /*break*/, 11];
+                        return [3 /*break*/, 12];
                     case 3:
                         this.getTodos();
-                        return [3 /*break*/, 12];
+                        return [3 /*break*/, 13];
                     case 4: return [4 /*yield*/, this.prompt(rl, 'Enter todo title: ')];
                     case 5:
                         todoTitle = _b.sent();
@@ -101,22 +103,25 @@ var AppClient = /** @class */ (function () {
                         todo = { title: todoTitle, text: todoText, dueDate: dateObject };
                         console.log(todo);
                         this.createTodo(todo);
-                        return [3 /*break*/, 12];
+                        return [3 /*break*/, 13];
                     case 10:
-                        this.signOut();
-                        return [3 /*break*/, 12];
+                        this.whoAmI();
+                        return [3 /*break*/, 13];
                     case 11:
+                        this.signOut();
+                        return [3 /*break*/, 13];
+                    case 12:
                         console.log('Invalid option');
-                        return [3 /*break*/, 12];
-                    case 12: return [3 /*break*/, 1];
-                    case 13: return [3 /*break*/, 15];
-                    case 14:
+                        return [3 /*break*/, 13];
+                    case 13: return [3 /*break*/, 1];
+                    case 14: return [3 /*break*/, 16];
+                    case 15:
                         error_1 = _b.sent();
                         console.error("Authentication failed: ".concat(error_1.message));
                         this.disconnect();
                         process.exit();
-                        return [3 /*break*/, 15];
-                    case 15: return [2 /*return*/];
+                        return [3 /*break*/, 16];
+                    case 16: return [2 /*return*/];
                 }
             });
         });
@@ -132,9 +137,7 @@ var AppClient = /** @class */ (function () {
                             withCredentials: true,
                             transportOptions: {
                                 polling: {
-                                    extraHeaders: {
-                                        userId: 0,
-                                    }
+                                    extraHeaders: {}
                                 }
                             }
                         };
@@ -169,8 +172,14 @@ var AppClient = /** @class */ (function () {
                         this.socket.on('message', function (message) {
                             console.log("Received message: ".concat(message));
                         });
+                        this.socket.on('whoami', function (userId) {
+                            console.log("Received userId: ".concat(JSON.stringify(userId, null, 2)));
+                        });
                         this.socket.on('get-todos', function (todos) {
                             console.table("Received todos: ".concat(JSON.stringify(todos, null, 2)));
+                        });
+                        this.socket.on('create-todo', function (todo) {
+                            console.log("Created todo: ".concat(JSON.stringify(todo, null, 2)));
                         });
                         return [2 /*return*/, this.socketOptions.transportOptions.polling.extraHeaders.userId];
                 }
@@ -179,6 +188,9 @@ var AppClient = /** @class */ (function () {
     };
     AppClient.prototype.disconnect = function () {
         this.socket.disconnect();
+    };
+    AppClient.prototype.whoAmI = function () {
+        this.socket.emit('whoami');
     };
     AppClient.prototype.getTodos = function () {
         this.socket.emit('get-todos');
@@ -189,6 +201,7 @@ var AppClient = /** @class */ (function () {
     AppClient.prototype.signOut = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
+                console.log('Signing out...');
                 this.disconnect();
                 process.exit();
                 return [2 /*return*/];
