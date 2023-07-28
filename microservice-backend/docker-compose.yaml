@@ -1,0 +1,76 @@
+version: '3'
+services:
+  app:
+    container_name: http-api
+    build:
+      context: ./http-api
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_NAME: nest
+      DATABASE_URI: mongodb://mongodbApp:27017
+      USER_SERVICE_HOST: user-microservice
+      TODO_SERVICE_URI: todo-microservice
+    ports:
+      - '4000:4000'
+    depends_on:
+      - user-microservice
+      - todo-microservice
+      - mongodbApp
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - node-network
+
+  todo-microservice:
+    container_name: todo-microservice
+    build:
+      context: ./todo-service
+      dockerfile: Dockerfile
+    ports:
+      - '4001:4001'
+    environment:
+      DATABASE_NAME: nest
+      DATABASE_URI: mongodb://mongodbApp:27017
+      USER_SERVICE_HOST: user-microservice
+      TODO_SERVICE_URI: todo-microservice
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - node-network
+
+  user-microservice:
+    container_name: user-microservice
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_NAME: nest
+      DATABASE_URI: mongodb://mongodbApp:27017
+      USER_SERVICE_HOST: user-microservice
+      TODO_SERVICE_URI: todo-microservice
+    ports:
+      - '4002:4002'
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - node-network
+
+  mongodbApp:
+    image: mongo:6.0
+    container_name: mongodbApp
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./data:/data/db
+    networks:
+      - node-network
+    logging:
+      driver: none
+
+volumes:
+  mongodb:
+
+networks:
+  node-network:
+    driver: bridge

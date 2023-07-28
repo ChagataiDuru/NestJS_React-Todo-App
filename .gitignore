@@ -126,3 +126,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 backend/src/notes.txt
+microservice-backend/data

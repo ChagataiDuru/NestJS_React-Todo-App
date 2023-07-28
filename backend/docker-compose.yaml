@@ -11,8 +11,9 @@ services:
       dockerfile: Dockerfile
     environment:
       DATABASE_NAME: nest
+      DATABASE_USER: # DATABASE_USER
+      DATABASE_PASS: # DATABASE_PASS
       DATABASE_URI: mongodb://mongodb:27017/nest
-
     command: npm run start:dev
     ports:
       - '4000:4000'
@@ -37,10 +38,12 @@ services:
       - mongo:/data/db
     networks:
       - node-network
+    logging:
+      driver: none
 
 volumes:
   dbdata6:
-  mongo:
+  mongodb:
 
 networks:
   node-network:
