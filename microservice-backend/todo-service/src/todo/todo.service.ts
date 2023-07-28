@@ -41,7 +41,8 @@ export class TodoService {
   }
 
   async findOneByOwner(owner: any): Promise<ToDoDocument[]> {
-    return this.todoModel.find({ owner: owner }).exec();
+    console.log("SERVICE owner: ",owner);
+    return this.todoModel.find({ owner: owner._id }).exec();
   }
 
   async findOneById(id: number): Promise<ToDoDocument> {

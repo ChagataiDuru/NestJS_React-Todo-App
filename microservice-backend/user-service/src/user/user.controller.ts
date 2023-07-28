@@ -9,9 +9,7 @@ import { UserDto } from './dtos/user.dto';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { AuthGuard } from '../guards/auth.guard';
 import { User } from './user.schema';
-import { AdminGuard } from '../guards/admin.guard';
 
 
 @Controller('auth')
@@ -68,6 +66,14 @@ export class UserController {
         const user = await this.usersService.findOneById(Number(id));
         if (user) {
           return await this.usersService.deleteUser(Number(id));
+        }
+    }
+
+    @MessagePattern({ cmd: 'updateUser' })
+    async updateUser(@Param('id') id: number, @Body() body: CreateUserDto) {
+        const user = await this.usersService.findOneById(Number(id));
+        if (user) {
+          return await this.usersService.updateUser(id, body);
         }
     }
 

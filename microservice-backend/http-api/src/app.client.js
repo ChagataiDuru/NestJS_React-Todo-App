@@ -48,15 +48,15 @@ var AppClient = /** @class */ (function () {
     }
     AppClient.prototype.start = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var option, _a, todo, error_1;
+            var option, _a, todoTitle, todoText, todoDueDate, validDate, timestamp, dateObject, todo, error_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        _b.trys.push([0, 10, , 11]);
+                        _b.trys.push([0, 14, , 15]);
                         option = '';
                         _b.label = 1;
                     case 1:
-                        if (!(option !== '3')) return [3 /*break*/, 9];
+                        if (!(option !== '3')) return [3 /*break*/, 13];
                         console.log('Select an option:');
                         console.log('1 - Get all todos');
                         console.log('2 - Create todo');
@@ -68,32 +68,55 @@ var AppClient = /** @class */ (function () {
                         switch (_a) {
                             case '1': return [3 /*break*/, 3];
                             case '2': return [3 /*break*/, 4];
-                            case '3': return [3 /*break*/, 6];
+                            case '3': return [3 /*break*/, 10];
                         }
-                        return [3 /*break*/, 7];
+                        return [3 /*break*/, 11];
                     case 3:
                         this.getTodos();
-                        return [3 /*break*/, 8];
-                    case 4: return [4 /*yield*/, this.prompt(rl, 'Enter todo text: ')];
+                        return [3 /*break*/, 12];
+                    case 4: return [4 /*yield*/, this.prompt(rl, 'Enter todo title: ')];
                     case 5:
-                        todo = _b.sent();
-                        this.createTodo(todo);
-                        return [3 /*break*/, 8];
+                        todoTitle = _b.sent();
+                        return [4 /*yield*/, this.prompt(rl, 'Enter todo text: ')];
                     case 6:
-                        this.signOut();
-                        return [3 /*break*/, 8];
+                        todoText = _b.sent();
+                        todoDueDate = '';
+                        validDate = false;
+                        _b.label = 7;
                     case 7:
-                        console.log('Invalid option');
-                        return [3 /*break*/, 8];
-                    case 8: return [3 /*break*/, 1];
-                    case 9: return [3 /*break*/, 11];
+                        if (!!validDate) return [3 /*break*/, 9];
+                        return [4 /*yield*/, this.prompt(rl, 'Enter todo due date (YYYY-MM-DD): ')];
+                    case 8:
+                        todoDueDate = _b.sent();
+                        timestamp = Date.parse(todoDueDate);
+                        if (isNaN(timestamp)) {
+                            console.log("Invalid date format. Please enter a valid date in the format YYYY-MM-DD.");
+                        }
+                        else {
+                            validDate = true;
+                        }
+                        return [3 /*break*/, 7];
+                    case 9:
+                        dateObject = new Date(todoDueDate);
+                        todo = { title: todoTitle, text: todoText, dueDate: dateObject };
+                        console.log(todo);
+                        this.createTodo(todo);
+                        return [3 /*break*/, 12];
                     case 10:
+                        this.signOut();
+                        return [3 /*break*/, 12];
+                    case 11:
+                        console.log('Invalid option');
+                        return [3 /*break*/, 12];
+                    case 12: return [3 /*break*/, 1];
+                    case 13: return [3 /*break*/, 15];
+                    case 14:
                         error_1 = _b.sent();
                         console.error("Authentication failed: ".concat(error_1.message));
                         this.disconnect();
                         process.exit();
-                        return [3 /*break*/, 11];
-                    case 11: return [2 /*return*/];
+                        return [3 /*break*/, 15];
+                    case 15: return [2 /*return*/];
                 }
             });
         });
@@ -161,7 +184,7 @@ var AppClient = /** @class */ (function () {
         this.socket.emit('get-todos');
     };
     AppClient.prototype.createTodo = function (todo) {
-        this.socket.emit('create-todos', todo);
+        this.socket.emit('create-todo', todo);
     };
     AppClient.prototype.signOut = function () {
         return __awaiter(this, void 0, void 0, function () {

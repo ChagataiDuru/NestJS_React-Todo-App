@@ -60,21 +60,21 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   }
 
 
-  @UseGuards(WsAuthenticatedGuard)
+  //@UseGuards(WsAuthenticatedGuard)
   @SubscribeMessage('message')
   handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() data: string): void {
     this.logger.log(`Client ${socket.id} sent: ${data}`);
     this.server.sockets.emit('message', data);
   }
 
-  @UseGuards(WsAuthenticatedGuard)
+  //@UseGuards(WsAuthenticatedGuard)
   @SubscribeMessage('get-todos')
   private async handleGetTodos(@ConnectedSocket() socket: Socket): Promise<void> {
     this.logger.log(`Client ${socket.id} sent: get-todos`);
-    this.logger.log(socket.handshake.headers.userid);
-    const id = Number(socket.handshake.headers.userid);  
+    const id = Number(socket.handshake.headers.userid); 
+    this.logger.log(socket.handshake.headers.userid); 
     const user = await new Promise<UserDto>((resolve, reject) => {
-      this.userClient.send({ cmd: 'findOneById' }, {userid: id}).subscribe({
+      this.userClient.send({ cmd: 'getUser' }, {userid: id}).subscribe({
         next: (user: UserDto) => {
           resolve(user);
         },
@@ -84,7 +84,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
       });
     });
     const todos = await new Promise<TodoDto[]>((resolve, reject) => {
-      this.todoClient.send({ cmd: 'findOneByOwner' }, {owner: user}).subscribe({
+      this.todoClient.send({ cmd: 'findMyTodos' }, {owner: user}).subscribe({
         next: (todos: TodoDto[]) => {
           resolve(todos);
         },
@@ -94,5 +94,45 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
       });
     });
     this.server.sockets.emit('get-todos', todos);
+  }
+
+  //@UseGuards(WsAuthenticatedGuard)
+  @SubscribeMessage('create-todo')
+  private async handleCreateTodo(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() todo: any,
+  ): Promise<void> {
+    this.logger.log(`Client ${socket.id} sent: create-todo`);
+    const id = Number(socket.handshake.headers.userid); 
+    this.logger.log(socket.handshake.headers.userid); 
+    const user = await new Promise<UserDto>((resolve, reject) => {
+      this.userClient.send({ cmd: 'getUser' }, {userid: id}).subscribe({
+        next: (user: UserDto) => {
+          resolve(user);
+        },
+        error: (error: any) => {
+          reject(error);
+        },
+      });
+    });
+    console.log(user);
+    const serverTodo = 
+    {
+        title: todo.title,
+        description: todo.text,
+        due: todo.dueDate
+    };
+    console.log(serverTodo);
+    const createdTodo = await new Promise<TodoDto>((resolve, reject) => {
+      this.todoClient.send({ cmd: 'createTodo' }, {todo: serverTodo, user: user}).subscribe({
+        next: (todo: TodoDto) => {
+          resolve(todo);
+        },
+        error: (error: any) => {
+          reject(error);
+        },
+      });
+    });
+    this.server.sockets.emit('create-todo', createdTodo);
   }
 }

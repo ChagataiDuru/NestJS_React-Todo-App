@@ -27,10 +27,25 @@ export class AppClient {
           case '1':
             this.getTodos();
             break;
-          case '2':
-            const todo = await this.prompt(rl, 'Enter todo text: ');
-            this.createTodo(todo);
-            break;
+            case '2':
+              const todoTitle = await this.prompt(rl, 'Enter todo title: ');
+              const todoText = await this.prompt(rl, 'Enter todo text: ');
+              let todoDueDate = '';
+              let validDate = false;
+              while (!validDate) {
+                todoDueDate = await this.prompt(rl, 'Enter todo due date (YYYY-MM-DD): ');
+                const timestamp = Date.parse(todoDueDate);
+                if (isNaN(timestamp)) {
+                  console.log("Invalid date format. Please enter a valid date in the format YYYY-MM-DD.");
+                } else {
+                  validDate = true;
+                }
+              }
+              const dateObject = new Date(todoDueDate);
+              const todo = {title: todoTitle, text: todoText, dueDate: dateObject };
+              console.log(todo);
+              this.createTodo(todo);
+              break;
           case '3':
             this.signOut();
             break;
@@ -95,8 +110,8 @@ export class AppClient {
   private getTodos() {
     this.socket.emit('get-todos');
   }
-  private createTodo(todo: string) {
-    this.socket.emit('create-todos', todo);
+  private createTodo(todo: any) {
+    this.socket.emit('create-todo', todo);
   }
   private async signOut() {
     this.disconnect();

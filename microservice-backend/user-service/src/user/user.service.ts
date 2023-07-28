@@ -46,7 +46,7 @@ export class UserService {
         return users
       }
     
-      async updateUser(id: string, body: UpdateUserInput): Promise<UserPayload> {
+      async updateUser(id: number, body: UpdateUserInput): Promise<UserPayload> {
         await this.userModel.updateOne({ userId: id }, body)
         const updatedUser = this.userModel.findById(id)
         return updatedUser
