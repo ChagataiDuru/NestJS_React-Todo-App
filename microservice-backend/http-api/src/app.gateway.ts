@@ -67,6 +67,24 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     this.server.sockets.emit('message', data);
   }
 
+  @SubscribeMessage('whoami')
+  private async handleWhoAmI(@ConnectedSocket() socket: Socket): Promise<void> {
+    this.logger.log(`Client ${socket.id} sent: whoami`);
+    console.log(socket.handshake.headers);
+    const id = Number(socket.handshake.headers.userid);
+    const user = await new Promise<UserDto>((resolve, reject) => {
+      this.userClient.send({ cmd: 'getUser' }, {userid: id}).subscribe({
+        next: (user: UserDto) => {
+          resolve(user);
+        },
+        error: (error: any) => {
+          reject(error);
+        },
+      });
+    });
+    socket.emit('whoami', user);
+  }
+
   //@UseGuards(WsAuthenticatedGuard)
   @SubscribeMessage('get-todos')
   private async handleGetTodos(@ConnectedSocket() socket: Socket): Promise<void> {
@@ -135,4 +153,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     });
     this.server.sockets.emit('create-todo', createdTodo);
   }
+
+  //@UseGuards(WsAuthenticatedGuard)
+  
+
 }
