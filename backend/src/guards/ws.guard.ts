@@ -8,18 +8,15 @@ export class WsAuthenticatedGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const client: Socket = context.switchToWs().getClient();
-    const UserId = client.handshake.headers.userId;
+    const UserId = client.handshake.headers.userid;
     if (!UserId) {
+      console.log('no user id')
       return false;
     }
-
     const user = await this.userService.findOneById(Number(UserId));
     if (!user) {
       return false;
     }
-  
-    const data = context.switchToWs().getData()
-    console.log(data)
   
     return true;
   }
