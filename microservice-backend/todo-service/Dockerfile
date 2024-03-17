@@ -8,7 +8,6 @@ COPY . .
 
 RUN npm install
 
-# Build the NestJS application
 RUN npm run build
 
 FROM node:18-alpine as runner

@@ -8,16 +8,17 @@ COPY . .
 
 RUN npm install
 
+# Build the NestJS application
 RUN npm run build
 
-FROM builder as runner
+FROM node:18-alpine as runner
 
 WORKDIR /app
 
 COPY package.json .
 
-EXPOSE 4000
+EXPOSE 4003
 
 COPY --from=builder /app .
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:dev"]xw

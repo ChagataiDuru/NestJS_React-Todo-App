@@ -51,7 +51,7 @@ services:
     ports:
       - '4002:4002'
     volumes:
-      - ./:/usr/src/app
+      - .http-api/:/usr/src/app
     networks:
       - node-network
 
